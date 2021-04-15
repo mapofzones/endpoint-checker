@@ -28,6 +28,42 @@ public class Node {
     @NonNull
     private Timestamp lastCheckedAt;
 
+    @NonNull
+    public String getZone() {
+        return zone;
+    }
+
+    public void setZone(@NonNull String zone) {
+        this.zone = zone;
+    }
+
+    @NonNull
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(@NonNull String address) {
+        this.address = address;
+    }
+
+    @NonNull
+    public Boolean getAlive() {
+        return isAlive;
+    }
+
+    public void setAlive(@NonNull Boolean alive) {
+        isAlive = alive;
+    }
+
+    @NonNull
+    public Timestamp getLastCheckedAt() {
+        return lastCheckedAt;
+    }
+
+    public void setLastCheckedAt(@NonNull Timestamp lastCheckedAt) {
+        this.lastCheckedAt = lastCheckedAt;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
