@@ -12,6 +12,8 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class Processor {
@@ -41,7 +43,7 @@ public class Processor {
     private void nodesLivenessChecker(List<Node> nodes) {
         for (Node node : nodes) {
             try {
-                URL url = new URL(node.getAddress());
+                URL url = new URL(node.getAddress() + "/status");
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("GET");
                 con.setConnectTimeout(5000);
@@ -55,9 +57,16 @@ public class Processor {
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(con.getInputStream()));
                 String inputLine;
-                StringBuffer content = new StringBuffer();
+//                StringBuffer content = new StringBuffer();
                 while ((inputLine = in.readLine()) != null) {
-                    content.append(inputLine);
+//                    content.append(inputLine);
+                    if (inputLine.contains("\"network\": \"")) {
+//                        System.out.println(inputLine);
+                        Pattern pattern = Pattern.compile("\"network\": \"(.*?)\"");
+                        Matcher matcher = pattern.matcher(inputLine);
+                        if (matcher.find())
+                            System.out.println(matcher.group(1));//todo: set it to the new Node entity
+                    }
                 }
 
                 in.close();
