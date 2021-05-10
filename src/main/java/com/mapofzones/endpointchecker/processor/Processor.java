@@ -12,11 +12,9 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
-public class Processor {
+public class Processor implements Parser {
     private final NodeRepository nodeRepository;
 
     public Processor(NodeRepository nodeRepository) {
@@ -29,9 +27,6 @@ public class Processor {
         List<Node> nodes = new ArrayList<>();
         System.out.println("ready to get nodes");
         nodes.addAll(nodeRepository.getNodes());
-//        for (Node node : nodes) {
-//            System.out.println(node);
-//        }
         System.out.println("ready to check endpoints");
         nodesLivenessChecker(nodes);
         System.out.println("ready to save nodes");
@@ -49,35 +44,27 @@ public class Processor {
                 con.setConnectTimeout(5000);
                 con.setReadTimeout(5000);
                 int status = con.getResponseCode();
-//                System.out.println("ResponseCode: " + status);
                 if (status == 200)
                     node.setAlive(true);
                 else node.setAlive(false);
 
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(con.getInputStream()));
-                String inputLine;
-//                StringBuffer content = new StringBuffer();
-                while ((inputLine = in.readLine()) != null) {
-//                    content.append(inputLine);
-                    if (inputLine.contains("\"network\": \"")) {
-//                        System.out.println(inputLine);
-                        Pattern pattern = Pattern.compile("\"network\": \"(.*?)\"");
-                        Matcher matcher = pattern.matcher(inputLine);
-                        if (matcher.find())
-                            System.out.println(matcher.group(1));//todo: set it to the new Node entity
-                    }
-                }
-
-                in.close();
+                String chainId = readResponse(con);
                 con.disconnect();
+
+                System.out.println(chainId); // todo: set it to the new Node entity
             } catch (IOException e) {
-//                e.printStackTrace();
                 node.setAlive(false);
             }
 
             node.setLastCheckedAt(new Timestamp(System.currentTimeMillis()));
-//            System.out.println(node);
         }
+    }
+
+    private String readResponse(HttpURLConnection con) throws IOException {
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String chainId = Parser.parseChainId(in, "network");
+        in.close();
+        return chainId;
     }
 }
