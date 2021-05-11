@@ -49,9 +49,11 @@ public class Processor implements Parser {
                 else node.setAlive(false);
 
                 String chainId = readResponse(con);
+                if (!node.getZone().equalsIgnoreCase(chainId)) {
+                    // todo: log this
+                    node.setZone(chainId);
+                }
                 con.disconnect();
-
-                System.out.println(chainId); // todo: set it to the new Node entity
             } catch (IOException e) {
                 node.setAlive(false);
             }
