@@ -9,7 +9,7 @@ Running directly:
 * java 11
 * maven
 
-Running directly:
+Running in a container:
 * Docker
 
 ## Usage
