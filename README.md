@@ -1,10 +1,16 @@
 # endpoint-checker
 
+Status of Last Deployment:<br>
+<img src="https://github.com/mapofzones/endpoint-checker/workflows/Java%20CI/badge.svg"><br>
+
 ## Requirements
 
 Running directly:
 * java 11
 * maven
+
+Running directly:
+* Docker
 
 ## Usage
 
