@@ -4,19 +4,51 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DefaultNodeInfo {
     @JsonProperty("protocol_version")
-    public ProtocolVersion protocolVersion;
+    private ProtocolVersion protocolVersion;
     @JsonProperty("id")
-    public String defaultNodeID;
+    private String defaultNodeID;
     @JsonProperty("listen_addr")
-    public String listenAddr;
+    private String listenAddr;
     @JsonProperty("network")
-    public String network;
+    private String network;
     @JsonProperty("version")
-    public String version;
+    private String version;
     @JsonProperty("channels")
-    public byte[] channels;
+    private byte[] channels;
     @JsonProperty("moniker")
-    public String moniker;
+    private String moniker;
     @JsonProperty("other")
-    public DefaultNodeInfoOther other;
+    private DefaultNodeInfoOther other;
+
+    public ProtocolVersion getProtocolVersion() {
+        return protocolVersion;
+    }
+
+    public String getDefaultNodeID() {
+        return defaultNodeID;
+    }
+
+    public String getListenAddr() {
+        return listenAddr;
+    }
+
+    public String getNetwork() {
+        return network;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public byte[] getChannels() {
+        return channels;
+    }
+
+    public String getMoniker() {
+        return moniker;
+    }
+
+    public DefaultNodeInfoOther getOther() {
+        return other;
+    }
 }

@@ -6,11 +6,27 @@ import java.util.ArrayList;
 
 public class ConnectionStatus {
     @JsonProperty("Duration")
-    public Long duration;
+    private Long duration;
     @JsonProperty("SendMonitor")
-    public MonitorStatus sendMonitor;
+    private MonitorStatus sendMonitor;
     @JsonProperty("RecvMonitor")
-    public MonitorStatus recvMonitor;
+    private MonitorStatus recvMonitor;
     @JsonProperty("Channels")
-    public ArrayList<ChannelStatus> channels;
+    private ArrayList<ChannelStatus> channels;
+
+    public Long getDuration() {
+        return duration;
+    }
+
+    public MonitorStatus getSendMonitor() {
+        return sendMonitor;
+    }
+
+    public MonitorStatus getRecvMonitor() {
+        return recvMonitor;
+    }
+
+    public ArrayList<ChannelStatus> getChannels() {
+        return channels;
+    }
 }

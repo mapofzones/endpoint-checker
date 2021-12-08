@@ -4,7 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DefaultNodeInfoOther {
     @JsonProperty("tx_index")
-    public String txIndex;
+    private String txIndex;
     @JsonProperty("rpc_address")
-    public String rpcAddress;
+    private String rpcAddress;
+
+    public String getTxIndex() {
+        return txIndex;
+    }
+
+    public String getRpcAddress() {
+        return rpcAddress;
+    }
 }

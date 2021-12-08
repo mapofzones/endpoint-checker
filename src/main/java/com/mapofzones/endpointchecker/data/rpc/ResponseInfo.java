@@ -6,13 +6,33 @@ import java.math.BigInteger;
 
 public class ResponseInfo {
     @JsonProperty("data")
-    public String data;
+    private String data;
     @JsonProperty("version")
-    public String version;
+    private String version;
     @JsonProperty("app_version")
-    public BigInteger appVersion;
+    private BigInteger appVersion;
     @JsonProperty("last_block_height")
-    public Long LastBlockHeight;
+    private Long LastBlockHeight;
     @JsonProperty("last_block_app_hash")
-    public byte[] LastBlockAppHash;
+    private byte[] LastBlockAppHash;
+
+    public String getData() {
+        return data;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public BigInteger getAppVersion() {
+        return appVersion;
+    }
+
+    public Long getLastBlockHeight() {
+        return LastBlockHeight;
+    }
+
+    public byte[] getLastBlockAppHash() {
+        return LastBlockAppHash;
+    }
 }

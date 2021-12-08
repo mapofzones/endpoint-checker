@@ -6,29 +6,81 @@ import java.sql.Timestamp;
 
 public class MonitorStatus {
     @JsonProperty("Start")
-    public Timestamp start;
+    private Timestamp start;
     @JsonProperty("Bytes")
-    public Long bytes;
+    private Long bytes;
     @JsonProperty("Samples")
-    public Long samples;
+    private Long samples;
     @JsonProperty("InstRate")
-    public Long instRate;
+    private Long instRate;
     @JsonProperty("CurRate")
-    public Long curRate;
+    private Long curRate;
     @JsonProperty("AvgRate")
-    public Long avgRate;
+    private Long avgRate;
     @JsonProperty("PeakRate")
-    public Long peakRate;
+    private Long peakRate;
     @JsonProperty("BytesRem")
-    public Long bytesRem;
+    private Long bytesRem;
     @JsonProperty("Duration")
-    public Long duration;
+    private Long duration;
     @JsonProperty("Idle")
-    public Long idle;
+    private Long idle;
     @JsonProperty("TimeRem")
-    public Long timeRem;
+    private Long timeRem;
     @JsonProperty("Progress")
-    public Long progress;
+    private Long progress;
     @JsonProperty("Active")
-    public Boolean active;
+    private Boolean active;
+
+    public Timestamp getStart() {
+        return start;
+    }
+
+    public Long getBytes() {
+        return bytes;
+    }
+
+    public Long getSamples() {
+        return samples;
+    }
+
+    public Long getInstRate() {
+        return instRate;
+    }
+
+    public Long getCurRate() {
+        return curRate;
+    }
+
+    public Long getAvgRate() {
+        return avgRate;
+    }
+
+    public Long getPeakRate() {
+        return peakRate;
+    }
+
+    public Long getBytesRem() {
+        return bytesRem;
+    }
+
+    public Long getDuration() {
+        return duration;
+    }
+
+    public Long getIdle() {
+        return idle;
+    }
+
+    public Long getTimeRem() {
+        return timeRem;
+    }
+
+    public Long getProgress() {
+        return progress;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
 }

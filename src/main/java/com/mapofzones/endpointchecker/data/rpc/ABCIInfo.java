@@ -4,5 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ABCIInfo {
     @JsonProperty("response")
-    public ResponseInfo response;
+    private ResponseInfo response;
+
+    public ResponseInfo getResponse() {
+        return response;
+    }
 }

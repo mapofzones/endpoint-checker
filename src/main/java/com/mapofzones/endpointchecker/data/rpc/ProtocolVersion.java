@@ -6,9 +6,21 @@ import java.math.BigInteger;
 
 public class ProtocolVersion {
     @JsonProperty("p2p")
-    public BigInteger p2p;
+    private BigInteger p2p;
     @JsonProperty("block")
-    public BigInteger block;
+    private BigInteger block;
     @JsonProperty("app")
-    public BigInteger app;
+    private BigInteger app;
+
+    public BigInteger getP2p() {
+        return p2p;
+    }
+
+    public BigInteger getBlock() {
+        return block;
+    }
+
+    public BigInteger getApp() {
+        return app;
+    }
 }

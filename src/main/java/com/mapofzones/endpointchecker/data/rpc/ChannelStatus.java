@@ -4,13 +4,33 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ChannelStatus {
     @JsonProperty("ID")
-    public byte id;
+    private byte id;
     @JsonProperty("SendQueueCapacity")
-    public Integer sendQueueCapacity;
+    private Integer sendQueueCapacity;
     @JsonProperty("SendQueueSize")
-    public Integer sendQueueSize;
+    private Integer sendQueueSize;
     @JsonProperty("Priority")
-    public Integer priority;
+    private Integer priority;
     @JsonProperty("RecentlySent")
-    public Long recentlySent;
+    private Long recentlySent;
+
+    public byte getId() {
+        return id;
+    }
+
+    public Integer getSendQueueCapacity() {
+        return sendQueueCapacity;
+    }
+
+    public Integer getSendQueueSize() {
+        return sendQueueSize;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public Long getRecentlySent() {
+        return recentlySent;
+    }
 }
