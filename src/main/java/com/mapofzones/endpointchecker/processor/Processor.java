@@ -1,14 +1,19 @@
 package com.mapofzones.endpointchecker.processor;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.mapofzones.endpointchecker.data.entities.Node;
 import com.mapofzones.endpointchecker.data.repositories.NodeRepository;
+import com.mapofzones.endpointchecker.data.rpc.ABCIInfo;
+import com.mapofzones.endpointchecker.data.rpc.NetInfo;
+import com.mapofzones.endpointchecker.data.rpc.Status;
+import com.mapofzones.endpointchecker.services.JsonRpcService;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,27 +42,47 @@ public class Processor implements Parser {
 
     private void nodesLivenessChecker(List<Node> nodes) {
         for (Node node : nodes) {
+            JsonRpcService jsonRpcService = new JsonRpcService();
             try {
-                URL url = new URL(node.getAddress() + "/status");
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                con.setRequestMethod("GET");
-                con.setConnectTimeout(5000);
-                con.setReadTimeout(5000);
-                int status = con.getResponseCode();
-                if (status == 200)
-                    node.setAlive(true);
-                else node.setAlive(false);
-
-                String chainId = readResponse(con);
-                if (!node.getZone().equalsIgnoreCase(chainId)) {
-                    // todo: log this
-                    node.setAlive(false);
-//                    node.setZone(chainId); // probably need to create new zone in DB
-                }
-                con.disconnect();
-            } catch (IOException e) {
+                jsonRpcService.initiate(node.getAddress());
+                ABCIInfo abciInfo = jsonRpcService.getABCIInfo();
+                NetInfo netInfo = jsonRpcService.getNetInfo();
+                Status nodeStatus = jsonRpcService.getNodeStatus();
+                node.setAlive(
+                        node.getZone().equalsIgnoreCase(
+                                nodeStatus.getNodeInfo().getNetwork()));
+            } catch (MalformedURLException | NullPointerException | SocketTimeoutException e) {
                 node.setAlive(false);
+            } catch (InvalidFormatException | JsonParseException e) {
+//                todo: try request again
+            } catch (ConnectException e) {
+//                todo: Connection refused logic
+            } catch (Exception e) {
+//                todo: something
             }
+
+
+//            try {
+//                URL url = new URL(node.getAddress() + "/status");
+//                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+//                con.setRequestMethod("GET");
+//                con.setConnectTimeout(5000);
+//                con.setReadTimeout(5000);
+//                int status = con.getResponseCode();
+//                if (status == 200)
+//                    node.setAlive(true);
+//                else node.setAlive(false);
+//
+//                String chainId = readResponse(con);
+//                if (!node.getZone().equalsIgnoreCase(chainId)) {
+//                    // todo: log this
+//                    node.setAlive(false);
+////                    node.setZone(chainId); // probably need to create new zone in DB
+//                }
+//                con.disconnect();
+//            } catch (IOException e) {
+//                node.setAlive(false);
+//            }
 
             node.setLastCheckedAt(new Timestamp(System.currentTimeMillis()));
         }

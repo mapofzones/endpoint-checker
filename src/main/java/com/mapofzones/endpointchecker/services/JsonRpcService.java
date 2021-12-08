@@ -1,5 +1,7 @@
 package com.mapofzones.endpointchecker.services;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import com.googlecode.jsonrpc4j.ProxyUtil;
 import com.mapofzones.endpointchecker.data.rpc.ABCIInfo;
@@ -7,7 +9,9 @@ import com.mapofzones.endpointchecker.data.rpc.NetInfo;
 import com.mapofzones.endpointchecker.data.rpc.NodeInfoService;
 import com.mapofzones.endpointchecker.data.rpc.Status;
 
+import java.net.ConnectException;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 
 public class JsonRpcService {
@@ -41,11 +45,11 @@ public class JsonRpcService {
         return nodeInfoService.getStatus();
     }
 
-    public NetInfo getNetInfo() {
+    public NetInfo getNetInfo() throws InvalidFormatException {
         return nodeInfoService.getNetInfo();
     }
 
-    public ABCIInfo getABCIInfo() {
+    public ABCIInfo getABCIInfo() throws SocketTimeoutException, JsonParseException, ConnectException {
         return nodeInfoService.getABCIInfo();
     }
 }
