@@ -10,7 +10,7 @@ public interface NodeInfoService {
     Status getStatus();
 
     @JsonRpcMethod("net_info")
-    LinkedHashMap getNetInfo();
+    NetInfo getNetInfo();
 
     @JsonRpcMethod("abci_info")
     ABCIInfo getABCIInfo();
