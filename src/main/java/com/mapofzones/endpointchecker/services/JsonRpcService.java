@@ -14,10 +14,12 @@ public class JsonRpcService {
     private NodeInfoService nodeInfoService;
 
     public void initiate(String url) throws MalformedURLException {
-        nodeInfoService = this.getNodeInfoService(
-                this.createClient(
-                        this.getURLbyUrlString(
-                                url)));
+//        todo: do we need context?
+        URL rpc = this.getURLbyUrlString(url);
+        JsonRpcHttpClient client = this.createClient(rpc);
+        client.setConnectionTimeoutMillis(5000);
+        client.setReadTimeoutMillis(5000);
+        nodeInfoService = this.getNodeInfoService(client);
     }
 
     private URL getURLbyUrlString(String url) throws MalformedURLException {
