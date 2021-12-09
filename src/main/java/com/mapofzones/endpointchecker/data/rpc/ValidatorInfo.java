@@ -6,14 +6,14 @@ import java.util.HashMap;
 
 public class ValidatorInfo {
     @JsonProperty("address")
-    private byte[] address;
+    private String address;
 //    todo: check it. HashMap type mb change to PubKey custom type
     @JsonProperty("pub_key")
     private HashMap pubKey;
     @JsonProperty("voting_power")
     private Long votingPower;
 
-    public byte[] getAddress() {
+    public String getAddress() {
         return address;
     }
 

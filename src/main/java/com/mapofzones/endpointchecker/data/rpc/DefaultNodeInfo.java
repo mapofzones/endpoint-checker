@@ -14,7 +14,7 @@ public class DefaultNodeInfo {
     @JsonProperty("version")
     private String version;
     @JsonProperty("channels")
-    private byte[] channels;
+    private String channels;
     @JsonProperty("moniker")
     private String moniker;
     @JsonProperty("other")
@@ -40,7 +40,7 @@ public class DefaultNodeInfo {
         return version;
     }
 
-    public byte[] getChannels() {
+    public String getChannels() {
         return channels;
     }
 

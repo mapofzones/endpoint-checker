@@ -14,7 +14,7 @@ public class ResponseInfo {
     @JsonProperty("last_block_height")
     private Long LastBlockHeight;
     @JsonProperty("last_block_app_hash")
-    private byte[] LastBlockAppHash;
+    private String LastBlockAppHash;
 
     public String getData() {
         return data;
@@ -32,7 +32,7 @@ public class ResponseInfo {
         return LastBlockHeight;
     }
 
-    public byte[] getLastBlockAppHash() {
+    public String getLastBlockAppHash() {
         return LastBlockAppHash;
     }
 }

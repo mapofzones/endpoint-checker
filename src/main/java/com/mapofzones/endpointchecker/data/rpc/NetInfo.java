@@ -12,7 +12,7 @@ public class NetInfo {
     @JsonProperty("n_peers")
     private Integer nPeers;
     @JsonProperty("peers")
-    private Peer[] peers;
+    private ArrayList<Peer> peers;
 
     public Boolean getListening() {
         return listening;
@@ -26,7 +26,7 @@ public class NetInfo {
         return nPeers;
     }
 
-    public Peer[] getPeers() {
+    public ArrayList<Peer> getPeers() {
         return peers;
     }
 }
