@@ -88,7 +88,7 @@ public class Processor implements Parser {
                     String port = Integer.toString(new URL(node.getAddress()).getPort());
                     lcd = node.getAddress().replace(":" + port, ":1317");
                 } else lcd = node.getLcdAddr();
-                URL url = new URL(lcd);
+                URL url = new URL(lcd + "/node_info");
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("GET");
                 con.setConnectTimeout(5000);
