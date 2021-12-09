@@ -69,11 +69,11 @@ public class Processor implements Parser {
                 node.setRpcAddrActive(true);
 //                todo: add peers to check them
 
-            } catch (MalformedURLException | NullPointerException | SocketTimeoutException e) {
+            } catch (SocketTimeoutException e) {
                 node.setAlive(false);
                 node.setRpcAddrActive(false);
-            } catch (InvalidFormatException | JsonParseException e) {
-//                todo: try request again
+            } catch (InvalidFormatException | JsonParseException | NullPointerException e) {
+//                todo: try request again. for MalformedURLException too?
             } catch (ConnectException e) {
 //                todo: Connection refused logic
             } catch (Exception e) {
