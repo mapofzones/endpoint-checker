@@ -53,7 +53,7 @@ public class Node {
     private Boolean isRecvConnectionActive;
 
     @Column(name = "last_block_height")
-    private Integer lastBlockHeight;
+    private Long lastBlockHeight;
 
     @Column(name = "is_rpc_addr_active")
     private Boolean isRpcAddrActive;
@@ -225,11 +225,11 @@ public class Node {
         isRecvConnectionActive = recvConnectionActive;
     }
 
-    public Integer getLastBlockHeight() {
+    public Long getLastBlockHeight() {
         return lastBlockHeight;
     }
 
-    public void setLastBlockHeight(Integer lastBlockHeight) {
+    public void setLastBlockHeight(Long lastBlockHeight) {
         this.lastBlockHeight = lastBlockHeight;
     }
 
