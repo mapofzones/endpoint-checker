@@ -44,6 +44,14 @@ public class Processor implements Parser {
         for (Node node : nodes) {
             JsonRpcService jsonRpcService = new JsonRpcService();
             try {
+                if (node.getIp() == null || node.getIp().isEmpty() || node.getIp().isBlank()) {
+                    if (node.getAddress() != null && !node.getAddress().isEmpty()) {
+                        URI uri = new URI(node.getAddress());
+                        String domain = uri.getHost();
+                        node.setIp(domain.startsWith("www.") ? domain.substring(4) : domain);
+                    }
+                }
+
                 jsonRpcService.initiate(node.getAddress());
                 ABCIInfo abciInfo = jsonRpcService.getABCIInfo();
                 NetInfo netInfo = jsonRpcService.getNetInfo();
@@ -51,8 +59,19 @@ public class Processor implements Parser {
                 node.setAlive(
                         node.getZone().equalsIgnoreCase(
                                 nodeStatus.getNodeInfo().getNetwork()));
+//                todo: check db is contains zone
+//                node.setZone(nodeStatus.getNodeInfo().getNetwork());
+                node.setNodeId(nodeStatus.getNodeInfo().getDefaultNodeID());
+                node.setVersion(nodeStatus.getNodeInfo().getVersion());
+                node.setTxIndex(nodeStatus.getNodeInfo().getOther().getTxIndex());
+                node.setMoniker(nodeStatus.getNodeInfo().getMoniker());
+                node.setLastBlockHeight(nodeStatus.getSyncInfo().getLatestBlockHeight());
+                node.setRpcAddrActive(true);
+//                todo: add peers to check them
+
             } catch (MalformedURLException | NullPointerException | SocketTimeoutException e) {
                 node.setAlive(false);
+                node.setRpcAddrActive(false);
             } catch (InvalidFormatException | JsonParseException e) {
 //                todo: try request again
             } catch (ConnectException e) {
@@ -62,27 +81,28 @@ public class Processor implements Parser {
             }
 
 
-//            try {
-//                URL url = new URL(node.getAddress() + "/status");
-//                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-//                con.setRequestMethod("GET");
-//                con.setConnectTimeout(5000);
-//                con.setReadTimeout(5000);
-//                int status = con.getResponseCode();
-//                if (status == 200)
-//                    node.setAlive(true);
-//                else node.setAlive(false);
-//
-//                String chainId = readResponse(con);
-//                if (!node.getZone().equalsIgnoreCase(chainId)) {
-//                    // todo: log this
-//                    node.setAlive(false);
-////                    node.setZone(chainId); // probably need to create new zone in DB
-//                }
-//                con.disconnect();
-//            } catch (IOException e) {
-//                node.setAlive(false);
-//            }
+
+            try {
+                String lcd;
+                if (node.getLcdAddr() == null || node.getLcdAddr().isEmpty()) {
+                    String port = Integer.toString(new URL(node.getAddress()).getPort());
+                    lcd = node.getAddress().replace(":" + port, ":1317");
+                } else lcd = node.getLcdAddr();
+                URL url = new URL(lcd);
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setRequestMethod("GET");
+                con.setConnectTimeout(5000);
+                con.setReadTimeout(5000);
+                int status = con.getResponseCode();
+                if (status == 200) {
+                    node.setLcdAddrActive(true);
+                    node.setLcdAddr(lcd);
+                }
+                else node.setLcdAddrActive(false);
+                con.disconnect();
+            } catch (IOException e) {
+                node.setLcdAddrActive(false);
+            }
 
             node.setLastCheckedAt(new Timestamp(System.currentTimeMillis()));
         }
