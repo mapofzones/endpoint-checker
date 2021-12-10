@@ -2,8 +2,11 @@ package com.mapofzones.endpointchecker.processor;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.mapofzones.endpointchecker.data.constants.NodeConstants;
 import com.mapofzones.endpointchecker.data.entities.Node;
+import com.mapofzones.endpointchecker.data.entities.Zone;
 import com.mapofzones.endpointchecker.data.repositories.NodeRepository;
+import com.mapofzones.endpointchecker.data.repositories.ZoneRepository;
 import com.mapofzones.endpointchecker.data.rpc.ABCIInfo;
 import com.mapofzones.endpointchecker.data.rpc.NetInfo;
 import com.mapofzones.endpointchecker.data.rpc.Status;
@@ -15,32 +18,39 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class Processor implements Parser {
     private final NodeRepository nodeRepository;
+    private final ZoneRepository zoneRepository;
 
-    public Processor(NodeRepository nodeRepository) {
+    public Processor(NodeRepository nodeRepository, ZoneRepository zoneRepository) {
         this.nodeRepository = nodeRepository;
+        this.zoneRepository = zoneRepository;
     }
 
     public void doScript() {
         System.out.println("Starting...");
 
         List<Node> nodes = new ArrayList<>();
+        Set<String> zones;
         System.out.println("ready to get nodes");
         nodes.addAll(nodeRepository.getNodes());
+        zones = zoneRepository.getZoneNames()
+                .stream()
+                .map(Zone::getChainId)
+                .collect(Collectors.toSet());
         System.out.println("ready to check endpoints");
-        nodesLivenessChecker(nodes);
+        nodesLivenessChecker(nodes, zones);
         System.out.println("ready to save nodes");
         nodeRepository.saveAll(nodes);
         System.out.println("Finished!");
         System.out.println("---------------");
     }
 
-    private void nodesLivenessChecker(List<Node> nodes) {
+    private void nodesLivenessChecker(List<Node> nodes, Set<String> zones) {
         for (Node node : nodes) {
             JsonRpcService jsonRpcService = new JsonRpcService();
             try {
@@ -56,17 +66,26 @@ public class Processor implements Parser {
                 ABCIInfo abciInfo = jsonRpcService.getABCIInfo();
                 NetInfo netInfo = jsonRpcService.getNetInfo();
                 Status nodeStatus = jsonRpcService.getNodeStatus();
-                node.setAlive(
-                        node.getZone().equalsIgnoreCase(
-                                nodeStatus.getNodeInfo().getNetwork()));
-//                todo: check db is contains zone
-//                node.setZone(nodeStatus.getNodeInfo().getNetwork());
+
+                String network = nodeStatus.getNodeInfo().getNetwork();
+                if (!network.equalsIgnoreCase(node.getZone())) {
+                    if (zones.contains(network)) {
+                        node.setAlive(true);
+                        node.setRpcAddrActive(true);
+                        node.setZone(network);
+                    } else {
+                        node.setAlive(false);
+                        node.setRpcAddrActive(false);
+                    }
+                } else {
+                    node.setAlive(true);
+                    node.setRpcAddrActive(true);
+                }
                 node.setNodeId(nodeStatus.getNodeInfo().getDefaultNodeID());
                 node.setVersion(nodeStatus.getNodeInfo().getVersion());
                 node.setTxIndex(nodeStatus.getNodeInfo().getOther().getTxIndex());
                 node.setMoniker(nodeStatus.getNodeInfo().getMoniker());
                 node.setLastBlockHeight(nodeStatus.getSyncInfo().getLatestBlockHeight());
-                node.setRpcAddrActive(true);
 //                todo: add peers to check them
 
             } catch (SocketTimeoutException e) {
@@ -79,8 +98,6 @@ public class Processor implements Parser {
             } catch (Exception e) {
 //                todo: something
             }
-
-
 
             try {
                 String lcd;

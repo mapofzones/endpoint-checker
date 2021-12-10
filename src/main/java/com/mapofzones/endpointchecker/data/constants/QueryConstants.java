@@ -41,4 +41,10 @@ public interface QueryConstants {
             "    is_hosting_location\n" +
             "from\n" +
             "    zone_nodes";
+
+    String GET_ZONE_NAMES = "" +
+            "select distinct\n" +
+            "    chain_id\n" +
+            "from\n" +
+            "    zones;";
 }
