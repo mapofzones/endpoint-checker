@@ -1,5 +1,6 @@
 package com.mapofzones.endpointchecker.processor;
 
+import com.mapofzones.endpointchecker.services.node.rpc.Parser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
