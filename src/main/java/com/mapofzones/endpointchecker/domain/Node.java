@@ -19,7 +19,7 @@ import java.sql.Timestamp;
 @EqualsAndHashCode(of = "address")
 @Entity
 @Table(name = "zone_nodes", schema = "public")
-public class Node {
+public class Node implements Cloneable{
     @Column(name = "zone")
     @NonNull
     private String zone;
@@ -173,5 +173,14 @@ public class Node {
                 ", locationOrgAsName='" + locationOrgAsName + '\'' +
                 ", isHostingLocation=" + isHostingLocation +
                 '}';
+    }
+
+    @Override
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            return new Node();
+        }
     }
 }

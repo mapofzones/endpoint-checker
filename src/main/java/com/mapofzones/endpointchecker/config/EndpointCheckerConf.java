@@ -15,8 +15,7 @@ public class EndpointCheckerConf {
     }
 
     @Bean
-    public IThreadStarter pathfinderThreadStarter() {
+    public IThreadStarter nodeCheckerThreadStarter() {
         return new ThreadStarter(endpointCheckerProperties().getThreads(), endpointCheckerProperties().getThreadsNaming());
     }
-
 }
