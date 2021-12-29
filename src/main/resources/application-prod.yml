@@ -1,3 +1,8 @@
+endpoint-checker:
+  sync-time: ${EC_SYNC_TIME}
+  threads: ${EC_THREADS}
+  threads-naming: 'Pool-EndpointChecker-Thread-%d'
+
 spring:
   datasource:
     url: ${DB_URL}

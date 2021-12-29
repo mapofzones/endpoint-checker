@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "address", callSuper = false)
+@EqualsAndHashCode(of = "address")
 @Entity
 @Table(name = "zone_nodes", schema = "public")
 public class Node {

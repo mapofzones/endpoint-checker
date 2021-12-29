@@ -22,4 +22,9 @@ public class GenericService<T, ID, R extends GenericRepository<T, ID>> implement
     public void saveAll(List<T> list) {
         repository.saveAll(list);
     }
+
+    @Override
+    public void save(T object) {
+        repository.save(object);
+    }
 }

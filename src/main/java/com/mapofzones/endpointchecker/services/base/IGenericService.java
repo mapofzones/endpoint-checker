@@ -6,5 +6,6 @@ public interface IGenericService<T, ID, R extends GenericRepository<T, ID>> {
 
     List<T> findAll();
     void saveAll(List<T> list);
+    void save(T object);
 
 }

@@ -1,8 +1,14 @@
+endpoint-checker:
+  sync-time: 60s
+  threads: 8
+  threads-naming: 'Pool-Pathfinder-Thread-%d'
+
 spring:
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASS}
+    url: jdbc:postgresql://localhost:5432/moz_db
+    username: postgres
+    password: postgres
     hikari:
+      maximum-pool-size: 8
       data-source-properties:
         stringtype: unspecified
