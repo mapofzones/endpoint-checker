@@ -9,5 +9,6 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASS}
     hikari:
+      maximum-pool-size: 4
       data-source-properties:
         stringtype: unspecified
