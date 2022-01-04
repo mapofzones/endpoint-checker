@@ -2,37 +2,42 @@ package com.mapofzones.endpointchecker.services.node.lcd;
 
 import com.mapofzones.endpointchecker.common.constants.NodeConstants;
 import com.mapofzones.endpointchecker.domain.Node;
+import com.mapofzones.endpointchecker.services.node.lcd.client.LcdClient;
+import com.mapofzones.endpointchecker.services.node.lcd.client.dto.NodeInfoDto;
+import com.mapofzones.endpointchecker.utils.URLHelper;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 @Service
 public class LsdService implements ILcdService {
 
+    private final LcdClient lcdClient;
+
+    public LsdService(LcdClient lcdClient) {
+        this.lcdClient = lcdClient;
+    }
+
     @Override
     public void checkLiveness(Node node) {
-        try {
-            String lcd;
-            if (node.getLcdAddr() == null || node.getLcdAddr().isEmpty()) {
-                String port = Integer.toString(new URL(node.getAddress()).getPort());
-                lcd = node.getAddress().replace(":" + port, ":" + NodeConstants.LCD_DEFAULT_PORT);
-            } else lcd = node.getLcdAddr();
-            URL url = new URL(lcd + "/node_info");
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-            con.setConnectTimeout(5000);
-            con.setReadTimeout(5000);
-            int status = con.getResponseCode();
-            if (status == 200) {
-                node.setIsLcdAddrActive(true);
-                node.setLcdAddr(lcd);
-            }
-            else node.setIsLcdAddrActive(false);
-            con.disconnect();
-        } catch (IOException e) {
+
+        String lcdAddress;
+
+        if (node.getLcdAddr() == null || node.getLcdAddr().isEmpty()) {
+            String port = URLHelper.getPort(node.getAddress());
+            lcdAddress = node.getAddress().replace(":" + port, ":" + NodeConstants.LCD_DEFAULT_PORT);
+        } else  {
+            lcdAddress = node.getLcdAddr();
+        }
+
+        NodeInfoDto nodeInfoDto = lcdClient.findNodeInfo(lcdAddress);
+
+        if (nodeInfoDto.isSuccessReceived() && nodeInfoDto.getNodeInfo().getNetwork().equals(node.getZone())) {
+            node.setLcdAddr(lcdAddress);
+            node.setIsLcdAddrActive(true);
+        } else {
             node.setIsLcdAddrActive(false);
         }
+
+        // TODO: set setLastCheckedAt before refactoring tables of database. (Now it set in RPC checkLiveness)
+        //node.setLastCheckedAt(new Timestamp(System.currentTimeMillis()));
     }
 }

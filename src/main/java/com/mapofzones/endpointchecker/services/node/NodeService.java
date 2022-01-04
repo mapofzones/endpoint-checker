@@ -8,6 +8,7 @@ import com.mapofzones.endpointchecker.services.node.rpc.client.JsonRpcClient;
 import com.mapofzones.endpointchecker.services.node.rpc.client.dto.NetInfo;
 import com.mapofzones.endpointchecker.services.node.rpc.client.dto.Peer;
 import com.mapofzones.endpointchecker.services.node.rpc.client.dto.Status;
+import com.mapofzones.endpointchecker.utils.URLHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -43,28 +44,27 @@ public class NodeService extends GenericService<Node, String, NodeRepository> im
             return new HashSet<>();
         }
 
+        //---- TODO: Need refactoring. To RpcService
         try {
             Status nodeStatus = jsonRpcClient.getNodeStatus();
-            checkLiveness(node, zoneNames, nodeStatus);
+            rpcService.checkLiveness(node, zoneNames, nodeStatus);
         } catch (Exception e) {
-            log.error("Status of \"" + node.getZone() + "\" (" + node.getAddress() + ") impossible to get.");
+            log.warn("Status of \"" + node.getZone() + "\" (" + node.getAddress() + ") impossible to get.");
             node.setIsAlive(false);
             node.setIsRpcAddrActive(false);
             return new HashSet<>();
         }
+        //----
+
+        lcdService.checkLiveness(node);
 
         try {
             NetInfo netInfo = jsonRpcClient.getNetInfo();
             return findPeers(node.getZone(), netInfo);
         } catch (Exception e) {
-            log.error("NetInfo of \"" + node.getZone() + "\" (" + node.getAddress() + ") impossible to get.");
+            log.warn("NetInfo of \"" + node.getZone() + "\" (" + node.getAddress() + ") impossible to get.");
             return new HashSet<>();
         }
-    }
-
-    private void checkLiveness(Node node, Set<String> zoneNames, Status status) {
-        rpcService.checkLiveness(node, zoneNames, status);
-        lcdService.checkLiveness(node);
     }
 
     private Set<Node> findPeers(String zone, NetInfo netInfo) {

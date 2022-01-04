@@ -2,6 +2,10 @@ adaptor:
   host: http://<ip>:<port>
   sync-time: 10000
 
+endpoint:
+  lcd:
+    node-info: '/node_info'
+
 spring:
   main:
     web-application-type: none
