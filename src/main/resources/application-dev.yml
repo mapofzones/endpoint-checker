@@ -1,7 +1,7 @@
 endpoint-checker:
   sync-time: 60s
   threads: 8
-  threads-naming: 'Pool-Pathfinder-Thread-%d'
+  threads-naming: 'Pool-EndpointChecker-Thread-%d'
 
 spring:
   datasource:
