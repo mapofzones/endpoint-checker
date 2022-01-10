@@ -8,9 +8,10 @@ import com.mapofzones.endpointchecker.services.node.rpc.client.JsonRpcClient;
 import com.mapofzones.endpointchecker.services.node.rpc.client.dto.NetInfo;
 import com.mapofzones.endpointchecker.services.node.rpc.client.dto.Peer;
 import com.mapofzones.endpointchecker.services.node.rpc.client.dto.Status;
-import com.mapofzones.endpointchecker.utils.URLHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
@@ -35,6 +36,7 @@ public class NodeService extends GenericService<Node, String, NodeRepository> im
     }
 
     @Override
+    @Transactional(propagation = Propagation.NEVER)
     public Set<Node> checkLivenessAndFindPeers(Node node, Set<String> zoneNames) {
         JsonRpcClient jsonRpcClient = new JsonRpcClient();
 
