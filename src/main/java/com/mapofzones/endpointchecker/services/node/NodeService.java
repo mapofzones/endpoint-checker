@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.mapofzones.endpointchecker.common.constants.NodeConstants.RPC_DEFAULT_PORT;
@@ -26,13 +27,21 @@ public class NodeService extends GenericService<Node, String, NodeRepository> im
 
     private final ILcdService lcdService;
     private final IRpcService rpcService;
+    private final NodeRepository nodeRepository;
 
     public NodeService(NodeRepository repository,
                        ILcdService lcdService,
-                       IRpcService rpcService) {
+                       IRpcService rpcService,
+                       NodeRepository nodeRepository) {
         super(repository);
         this.lcdService = lcdService;
         this.rpcService = rpcService;
+        this.nodeRepository = nodeRepository;
+    }
+
+    @Override
+    public List<Node> findTopOfOldNodes(Integer limit) {
+        return nodeRepository.findTopOfOldNodes(limit);
     }
 
     @Override

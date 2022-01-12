@@ -1,7 +1,8 @@
 endpoint-checker:
-  sync-time: 60s
-  threads: 8
+  sync-time: 1s
+  threads: 100
   threads-naming: 'Pool-EndpointChecker-Thread-%d'
+  page-size: 1000
 
 spring:
   datasource:
@@ -9,6 +10,6 @@ spring:
     username: postgres
     password: postgres
     hikari:
-      maximum-pool-size: 8
+      maximum-pool-size: 1
       data-source-properties:
         stringtype: unspecified

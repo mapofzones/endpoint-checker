@@ -1,5 +1,7 @@
 package com.mapofzones.endpointchecker.services;
 
+import com.mapofzones.endpointchecker.common.properties.EndpointCheckerProperties;
+import com.mapofzones.endpointchecker.common.properties.EndpointProperties;
 import com.mapofzones.endpointchecker.common.threads.IThreadStarter;
 import com.mapofzones.endpointchecker.domain.Node;
 import com.mapofzones.endpointchecker.services.node.INodeService;
@@ -22,6 +24,7 @@ public class NodesCheckerFacade {
     private final IZoneService zoneService;
     private final INodeService nodeService;
     private final IThreadStarter pathfinderThreadStarter;
+    private final EndpointCheckerProperties endpointCheckerProperties;
 
     private final Set<String> zoneNames = new HashSet<>();
     private final Set<Node> nodes = Collections.synchronizedSet(new HashSet<>());
@@ -30,10 +33,12 @@ public class NodesCheckerFacade {
 
     public NodesCheckerFacade(IZoneService zoneService,
                               INodeService nodeService,
-                              IThreadStarter pathfinderThreadStarter) {
+                              IThreadStarter pathfinderThreadStarter,
+                              EndpointCheckerProperties endpointCheckerProperties) {
         this.zoneService = zoneService;
         this.nodeService = nodeService;
         this.pathfinderThreadStarter = pathfinderThreadStarter;
+        this.endpointCheckerProperties = endpointCheckerProperties;
     }
 
     public void checkAll() {
@@ -41,7 +46,7 @@ public class NodesCheckerFacade {
         clearOldData();
 
         log.info("ready to get nodes");
-        nodes.addAll(nodeService.findAll());
+        nodes.addAll(nodeService.findTopOfOldNodes(endpointCheckerProperties.getPageSize()));
         findZoneNames();
 
         log.info("Ready to check endpoints");
