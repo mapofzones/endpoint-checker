@@ -133,6 +133,9 @@ public class Node implements Cloneable{
     @Column(name = "is_hosting_location")
     private Boolean isHostingLocation;
 
+    @Column(name = "earliest_block_height")
+    private Integer earliestBlockHeight;
+
     @Override
     public String toString() {
         return "Node{" +
@@ -171,7 +174,8 @@ public class Node implements Cloneable{
                 ", locationOrg='" + locationOrg + '\'' +
                 ", locationOrgAs='" + locationOrgAs + '\'' +
                 ", locationOrgAsName='" + locationOrgAsName + '\'' +
-                ", isHostingLocation=" + isHostingLocation +
+                ", isHostingLocation=" + isHostingLocation + '\'' +
+                ", earliestBlockHeight=" + earliestBlockHeight +
                 '}';
     }
 

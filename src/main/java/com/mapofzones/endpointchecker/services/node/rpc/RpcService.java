@@ -81,6 +81,7 @@ public class RpcService implements IRpcService {
             node.setTxIndex(nodeStatus.getNodeInfo().getOther().getTxIndex());
             node.setMoniker(nodeStatus.getNodeInfo().getMoniker());
             node.setLastBlockHeight(nodeStatus.getSyncInfo().getLatestBlockHeight());
+            node.setEarliestBlockHeight(nodeStatus.getSyncInfo().getEarliestBlockHeight());
 //                todo: add peers to check them
 
         } catch (NullPointerException e) {
