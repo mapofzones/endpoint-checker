@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.mapofzones.endpointchecker.common.constants.CommonConstants.EMPTY_STRING;
+
 public interface Parser {
     static String parseChainId(BufferedReader in, String key) throws IOException {
-        String chainId = "";
+        String chainId = EMPTY_STRING;
         String inputLine;
         while ((inputLine = in.readLine()) != null) {
             if (inputLine.contains("\"" + key + "\": \"")) {

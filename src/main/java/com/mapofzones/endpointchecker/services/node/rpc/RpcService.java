@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.mapofzones.endpointchecker.common.constants.CommonConstants.EMPTY_STRING;
 import static com.mapofzones.endpointchecker.common.constants.NodeConstants.RPC_DEFAULT_PORT;
 
 @Service
@@ -36,7 +37,6 @@ public class RpcService implements IRpcService {
             Status nodeStatus = jsonRpcClient.getNodeStatus();
             checkLiveness(node, zoneNames, nodeStatus);
         } catch (Exception e) {
-            log.warn("Status of \"" + node.getZone() + "\" (" + node.getAddress() + ") impossible to get.");
             node.setIsAlive(false);
             node.setIsRpcAddrActive(false);
             return Collections.emptySet();
@@ -46,7 +46,6 @@ public class RpcService implements IRpcService {
             NetInfo netInfo = jsonRpcClient.getNetInfo();
             return findPeers(node.getZone(), netInfo);
         } catch (Exception e) {
-            log.warn("NetInfo of \"" + node.getZone() + "\" (" + node.getAddress() + ") impossible to get.");
             return Collections.emptySet();
         }
     }
@@ -82,7 +81,6 @@ public class RpcService implements IRpcService {
             node.setMoniker(nodeStatus.getNodeInfo().getMoniker());
             node.setLastBlockHeight(nodeStatus.getSyncInfo().getLatestBlockHeight());
             node.setEarliestBlockHeight(nodeStatus.getSyncInfo().getEarliestBlockHeight());
-//                todo: add peers to check them
 
         } catch (NullPointerException e) {
 //                todo: try request again. for MalformedURLException too?
@@ -148,7 +146,7 @@ public class RpcService implements IRpcService {
                 return address;
             }
         }
-        return "";
+        return EMPTY_STRING;
     }
 
     private boolean isMultiRpcAddress (String rpcAddress) {

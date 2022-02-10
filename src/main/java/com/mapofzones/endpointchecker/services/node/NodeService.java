@@ -41,7 +41,7 @@ public class NodeService extends GenericService<Node, String, NodeRepository> im
     @Transactional(propagation = Propagation.NEVER)
     public Set<Node> checkLivenessAndFindPeers(Node node, Set<String> zoneNames) {
 
-        if (URLHelper.isIpAddressValid(node.getAddress())) {
+        if (URLHelper.isAddressValid(node.getAddress())) {
             Set<Node> foundPeers = rpcService.checkLivenessAndFindPeers(node, zoneNames);
             lcdService.checkLiveness(node);
             return foundPeers;

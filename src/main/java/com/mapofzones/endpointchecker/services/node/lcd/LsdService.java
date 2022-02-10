@@ -36,8 +36,5 @@ public class LsdService implements ILcdService {
         } else {
             node.setIsLcdAddrActive(false);
         }
-
-        // TODO: set setLastCheckedAt before refactoring tables of database. (Now it set in RPC checkLiveness)
-        //node.setLastCheckedAt(new Timestamp(System.currentTimeMillis()));
     }
 }

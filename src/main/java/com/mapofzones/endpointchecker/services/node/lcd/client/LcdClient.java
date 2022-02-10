@@ -30,7 +30,7 @@ public class LcdClient {
                 nodeInfo.setSuccessReceived(true);
                 return nodeInfo;
             } catch (RestClientException e) {
-                log.warn("Request cant be completed. " + uri);
+                //log.warn("Request cant be completed. " + uri);
                 return new NodeInfoDto(false);
             }
         } else return new NodeInfoDto(false);

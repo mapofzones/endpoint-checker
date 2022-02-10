@@ -55,8 +55,7 @@ public class ThreadStarter implements IThreadStarter{
         for (int i = 0; i < threadCount; i++) {
 
             CompletableFuture<Void> cf = CompletableFuture
-                    .runAsync(function, executorService)
-                    .thenRun(() -> log.info(Thread.currentThread().getName() + " is finished"));
+                    .runAsync(function, executorService);
 
             cfList.add(cf);
         }

@@ -65,7 +65,6 @@ public class NodesCheckerFacade {
     }
 
     public void check(Node node) {
-        log.info("Check: " + node.getAddress() + " (" + node.getZone() + " )");
         nodes.addAll(nodeService.checkLivenessAndFindPeers(node, zoneNames));
         node.setLastCheckedAt(new Timestamp(System.currentTimeMillis()));
     }

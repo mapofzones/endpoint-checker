@@ -1,12 +1,11 @@
 package com.mapofzones.endpointchecker.utils;
 
-import com.mapofzones.endpointchecker.common.exceptions.EndpointCheckerException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static com.mapofzones.endpointchecker.common.constants.CommonConstants.EMPTY_STRING;
 
 @Slf4j
 public class URLHelper {
@@ -15,28 +14,42 @@ public class URLHelper {
         try {
             return String.valueOf(new URL(address).getPort());
         } catch (MalformedURLException e) {
-            log.error("Cant parse address: " + address);
-            throw new EndpointCheckerException("Cant parse address: " + address, e.getCause());
+            log.warn("Cant find port: " + address);
+            return EMPTY_STRING;
         }
     }
 
-    public static boolean isIpAddressValid(String address) {
-        String ip;
+    public static boolean isAddressValid(String address) {
+        return isIpAddressValid(address) || isDomainNameOfAddressValid(address);
+    }
+
+    private static boolean isIpAddressValid(String address) {
         String zeroTo255 = "(\\d{1,2}|(0|1)\\d{2}|2[0-4]\\d|25[0-5])";
         String regex = zeroTo255 + "\\." + zeroTo255 + "\\." + zeroTo255 + "\\." + zeroTo255;
 
-        try {
-            ip = new URL(address).getHost();
-        } catch (MalformedURLException e) {
-            log.error("Cant parse address: " + address);
-            ip = "";
-        }
+        String ipAddress = getHost(address);
+        if (ipAddress.isBlank())
+            return false;
+        ;
+        return ipAddress.matches(regex);
+    }
 
-        if (ip == null || ip.isBlank())
+    private static boolean isDomainNameOfAddressValid(String address) {
+        String regex = "[a-z0-9.-]{1,63}";
+
+        String domainName = getHost(address);
+        if (domainName.isBlank())
             return false;
 
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(ip);
-        return m.matches();
+        return domainName.matches(regex);
+    }
+
+    private static String getHost(String address) {
+        try {
+            return new URL(address).getHost();
+        } catch (MalformedURLException e) {
+            log.warn("Cant find host: " + address);
+            return EMPTY_STRING;
+        }
     }
 }
