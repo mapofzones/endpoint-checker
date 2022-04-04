@@ -1,15 +1,14 @@
 package com.mapofzones.endpointchecker.services;
 
 import com.mapofzones.endpointchecker.common.properties.EndpointCheckerProperties;
-import com.mapofzones.endpointchecker.common.properties.EndpointProperties;
 import com.mapofzones.endpointchecker.common.threads.IThreadStarter;
-import com.mapofzones.endpointchecker.domain.Node;
-import com.mapofzones.endpointchecker.services.node.INodeService;
+import com.mapofzones.endpointchecker.domain.NodeAddress;
+import com.mapofzones.endpointchecker.services.node.INodeAddressService;
 import com.mapofzones.endpointchecker.services.zone.IZoneService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -17,26 +16,26 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-@Component
 @Slf4j
+@Component
 public class NodesCheckerFacade {
 
     private final IZoneService zoneService;
-    private final INodeService nodeService;
+    private final INodeAddressService nodeAddressService;
     private final IThreadStarter pathfinderThreadStarter;
     private final EndpointCheckerProperties endpointCheckerProperties;
 
     private final Set<String> zoneNames = new HashSet<>();
-    private final Set<Node> nodes = Collections.synchronizedSet(new HashSet<>());
+    private final Set<NodeAddress> nodeAddresses = Collections.synchronizedSet(new HashSet<>());
 
-    private BlockingQueue<Node> nodeQueue;
+    private BlockingQueue<NodeAddress> nodeAddressQueue;
 
     public NodesCheckerFacade(IZoneService zoneService,
-                              INodeService nodeService,
+                              INodeAddressService nodeAddressService,
                               IThreadStarter pathfinderThreadStarter,
                               EndpointCheckerProperties endpointCheckerProperties) {
         this.zoneService = zoneService;
-        this.nodeService = nodeService;
+        this.nodeAddressService = nodeAddressService;
         this.pathfinderThreadStarter = pathfinderThreadStarter;
         this.endpointCheckerProperties = endpointCheckerProperties;
     }
@@ -46,17 +45,17 @@ public class NodesCheckerFacade {
         clearOldData();
 
         log.info("ready to get nodes");
-        nodes.addAll(nodeService.findTopOfOldNodes(endpointCheckerProperties.getPageSize()));
+        nodeAddresses.addAll(nodeAddressService.findTopOfOldNodes(endpointCheckerProperties.getPageSize()));
         findZoneNames();
 
         log.info("Ready to check endpoints");
-        if (!nodes.isEmpty()) {
-            nodeQueue = new ArrayBlockingQueue<>(nodes.size(), true, nodes);
+        if (!nodeAddresses.isEmpty()) {
+            nodeAddressQueue = new ArrayBlockingQueue<>(nodeAddresses.size(), true, nodeAddresses);
             pathfinderThreadStarter.startThreads(nodesCheckerFunction);
             pathfinderThreadStarter.waitMainThread();
 
             log.info("Ready to save nodes");
-            nodeService.saveAll(new ArrayList<>(nodes));
+            nodeAddressService.saveAll(new ArrayList<>(nodeAddresses));
         }
 
         log.info("Finished!");
@@ -64,9 +63,9 @@ public class NodesCheckerFacade {
 
     }
 
-    public void check(Node node) {
-        nodes.addAll(nodeService.checkLivenessAndFindPeers(node, zoneNames));
-        node.setLastCheckedAt(new Timestamp(System.currentTimeMillis()));
+    public void check(NodeAddress nodeAddress) {
+        nodeAddresses.addAll(nodeAddressService.checkLivenessAndFindPeers(nodeAddress, zoneNames));
+        nodeAddress.setLastCheckedAt(LocalDateTime.now());
     }
 
     private void findZoneNames() {
@@ -78,10 +77,11 @@ public class NodesCheckerFacade {
 
     private final Runnable nodesCheckerFunction = () -> {
         while (true) {
-            if (!nodeQueue.isEmpty()) {
+            if (!nodeAddressQueue.isEmpty()) {
                 try {
-                    Node currentNode = nodeQueue.take();
+                    NodeAddress currentNode = nodeAddressQueue.take();
                     check(currentNode);
+                    log.info(currentNode.getIpOrDns() + "\t{}", "-- was checked");
                 } catch (InterruptedException e) {
                     log.error("Queue error. " + e.getCause());
                     e.printStackTrace();
@@ -92,8 +92,8 @@ public class NodesCheckerFacade {
     };
 
     private void clearOldData() {
-        if (!nodes.isEmpty()) {
-            nodes.clear();
+        if (!nodeAddresses.isEmpty()) {
+            nodeAddresses.clear();
             log.info("Old nodes cleared!!!");
         }
     }

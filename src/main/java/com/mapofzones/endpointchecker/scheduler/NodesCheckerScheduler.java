@@ -18,8 +18,8 @@ public class NodesCheckerScheduler {
 
     @Scheduled(fixedDelayString = "#{endpointCheckerProperties.syncTime}", initialDelay = 10)
     public void callDownloader() {
-        nodesCheckerFacade.checkAll();
         iteration += 1;
         log.info("Iteration: " + iteration);
+        nodesCheckerFacade.checkAll();
     }
 }

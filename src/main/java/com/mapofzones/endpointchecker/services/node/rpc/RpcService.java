@@ -1,6 +1,6 @@
 package com.mapofzones.endpointchecker.services.node.rpc;
 
-import com.mapofzones.endpointchecker.domain.Node;
+import com.mapofzones.endpointchecker.domain.NodeRpcAddress;
 import com.mapofzones.endpointchecker.services.node.rpc.client.JsonRpcClient;
 import com.mapofzones.endpointchecker.services.node.rpc.client.dto.NetInfo;
 import com.mapofzones.endpointchecker.services.node.rpc.client.dto.Peer;
@@ -9,11 +9,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.AbstractMap;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.mapofzones.endpointchecker.common.constants.CommonConstants.EMPTY_STRING;
 import static com.mapofzones.endpointchecker.common.constants.NodeConstants.RPC_DEFAULT_PORT;
@@ -22,77 +26,65 @@ import static com.mapofzones.endpointchecker.common.constants.NodeConstants.RPC_
 @Slf4j
 public class RpcService implements IRpcService {
 
-
     @Override
-    public Set<Node> checkLivenessAndFindPeers(Node node, Set<String> zoneNames) {
+    public Map<NodeAddressDto, Set<NodeRpcAddress>> checkLivenessAndFindPeers(NodeRpcAddress nodeRpcAddress, Set<String> zoneNames) {
         JsonRpcClient jsonRpcClient = new JsonRpcClient();
 
         try {
-            jsonRpcClient.initiate(node.getAddress());
+            jsonRpcClient.initiate(nodeRpcAddress.getRpcAddress());
         } catch (MalformedURLException e) {
-            return new HashSet<>();
+            return Collections.emptyMap();
         }
 
         try {
             Status nodeStatus = jsonRpcClient.getNodeStatus();
-            checkLiveness(node, zoneNames, nodeStatus);
+            checkLiveness(nodeRpcAddress, zoneNames, nodeStatus);
         } catch (Exception e) {
-            node.setIsAlive(false);
-            node.setIsRpcAddrActive(false);
-            return Collections.emptySet();
+            nodeRpcAddress.setIsAlive(false);
+            return Collections.emptyMap();
         }
 
         try {
             NetInfo netInfo = jsonRpcClient.getNetInfo();
-            return findPeers(node.getZone(), netInfo);
+            return findPeers(nodeRpcAddress.getZone(), netInfo);
         } catch (Exception e) {
-            return Collections.emptySet();
+            return Collections.emptyMap();
         }
     }
 
-    private void checkLiveness(Node node, Set<String> zoneNames, Status nodeStatus) {
+    private void checkLiveness(NodeRpcAddress nodeRpcAddress, Set<String> zoneNames, Status nodeStatus) {
 
         try {
-            if (node.getIp() == null || node.getIp().isEmpty() || node.getIp().isBlank()) {
-                if (!node.getAddress().isEmpty()) {
-                    URI uri = new URI(node.getAddress());
-                    String domain = uri.getHost();
-                    node.setIp(domain.startsWith("www.") ? domain.substring(4) : domain);
-                }
-            }
-
             String network = nodeStatus.getNodeInfo().getNetwork();
-            if (!network.equalsIgnoreCase(node.getZone())) {
+            if (!network.equalsIgnoreCase(nodeRpcAddress.getZone())) {
                 if (zoneNames.contains(network)) {
-                    node.setIsAlive(true);
-                    node.setIsRpcAddrActive(true);
-                    node.setZone(network);
+                    nodeRpcAddress.setIsAlive(true);
+                    nodeRpcAddress.setLastActive(LocalDateTime.now());
+                    nodeRpcAddress.setZone(network);
                 } else {
-                    node.setIsAlive(false);
-                    node.setIsRpcAddrActive(false);
+                    nodeRpcAddress.setIsAlive(false);
                 }
             } else {
-                node.setIsAlive(true);
-                node.setIsRpcAddrActive(true);
+                nodeRpcAddress.setIsAlive(true);
+                nodeRpcAddress.setLastActive(LocalDateTime.now());
             }
-            node.setNodeId(nodeStatus.getNodeInfo().getDefaultNodeID());
-            node.setVersion(nodeStatus.getNodeInfo().getVersion());
-            node.setTxIndex(nodeStatus.getNodeInfo().getOther().getTxIndex());
-            node.setMoniker(nodeStatus.getNodeInfo().getMoniker());
-            node.setLastBlockHeight(nodeStatus.getSyncInfo().getLatestBlockHeight());
-            node.setEarliestBlockHeight(nodeStatus.getSyncInfo().getEarliestBlockHeight());
+            nodeRpcAddress.setNodeId(nodeStatus.getNodeInfo().getDefaultNodeID());
+            nodeRpcAddress.setVersion(nodeStatus.getNodeInfo().getVersion());
+            nodeRpcAddress.setTxIndex(nodeStatus.getNodeInfo().getOther().getTxIndex());
+            nodeRpcAddress.setMoniker(nodeStatus.getNodeInfo().getMoniker());
+            nodeRpcAddress.setLastBlockHeight(nodeStatus.getSyncInfo().getLatestBlockHeight());
+            nodeRpcAddress.setEarliestBlockHeight(nodeStatus.getSyncInfo().getEarliestBlockHeight());
 
         } catch (NullPointerException e) {
 //                todo: try request again. for MalformedURLException too?
         } catch (Exception e) {
-            node.setIsAlive(false);
-            node.setIsRpcAddrActive(false);
+            nodeRpcAddress.setIsAlive(false);
         }
     }
 
-    private Set<Node> findPeers(String zone, NetInfo netInfo) {
+    private Map<NodeAddressDto, Set<NodeRpcAddress>> findPeers(String zone, NetInfo netInfo) {
+        Map<NodeAddressDto, Set<NodeRpcAddress>> foundPeers = new HashMap<>();
 
-        Set<Node> foundPeers = new HashSet<>();
         for (Peer peer : netInfo.getPeers()) {
 
             String rpcAddress = peer.getNodeInfo().getOther().getRpcAddress();
@@ -104,12 +96,15 @@ public class RpcService implements IRpcService {
 
                     String port = findPort(rpcAddress);
 
-                    Node foundPeer = buildNode(zone, port, peer);
-                    foundPeers.add(foundPeer);
+                    Map.Entry<NodeAddressDto, NodeRpcAddress> foundPeerEntry = buildNodeRpcAddress(zone, port, peer);
+                    if (foundPeers.containsKey(foundPeerEntry.getKey()))
+                        foundPeers.get(foundPeerEntry.getKey()).add(foundPeerEntry.getValue());
+                    else
+                        foundPeers.put(foundPeerEntry.getKey(), Stream.of(foundPeerEntry.getValue()).collect(Collectors.toCollection(HashSet::new)));
 
                     if (!port.equals(RPC_DEFAULT_PORT)) {
-                        Node extraNode = buildExtraNode(foundPeer);
-                        foundPeers.add(extraNode);
+                        NodeRpcAddress extraNodeRpcAddress = buildExtraNodeRpcAddress(foundPeerEntry.getValue());
+                        foundPeers.get(foundPeerEntry.getKey()).add(extraNodeRpcAddress);
                     }
                 }
             }
@@ -117,20 +112,28 @@ public class RpcService implements IRpcService {
         return foundPeers;
     }
 
-    private Node buildNode(String zone, String port, Peer peer) {
-        Node foundPeer = new Node();
-        foundPeer.setZone(zone);
-        foundPeer.setAddress("http://" + peer.getRemoteIP() + ":" + port);
-        foundPeer.setIp(peer.getRemoteIP());
-        foundPeer.setLastCheckedAt(new Timestamp(System.currentTimeMillis()));
-        foundPeer.setIsAlive(false);
-        return foundPeer;
+    private Map.Entry<NodeAddressDto, NodeRpcAddress> buildNodeRpcAddress(String zone, String port, Peer peer) {
+
+        NodeAddressDto foundNodeAddress = new NodeAddressDto();
+        foundNodeAddress.setIpOrDns(peer.getRemoteIP());
+        foundNodeAddress.setLastCheckedAt(LocalDateTime.now());
+
+        NodeRpcAddress foundNodeRpcAddress = new NodeRpcAddress();
+        foundNodeRpcAddress.setZone(zone);
+        foundNodeRpcAddress.setRpcAddress("http://" + peer.getRemoteIP() + ":" + port);
+        foundNodeRpcAddress.setNodeAddress(foundNodeAddress.getIpOrDns());
+        foundNodeRpcAddress.setLastCheckedAt(LocalDateTime.now());
+        foundNodeRpcAddress.setLastActive(LocalDateTime.now());
+        foundNodeRpcAddress.setIsAlive(false);
+        foundNodeRpcAddress.setIsHidden(false);
+        foundNodeRpcAddress.setIsPrioritized(false);
+        return new AbstractMap.SimpleEntry<>(foundNodeAddress, foundNodeRpcAddress);
     }
 
-    private Node buildExtraNode(Node foundPeer) {
-        Node extraNode = (Node) foundPeer.clone();
-        extraNode.setAddress("http://" + foundPeer.getIp() + ":" + RPC_DEFAULT_PORT);
-        return extraNode;
+    private NodeRpcAddress buildExtraNodeRpcAddress(NodeRpcAddress foundRpcAddress) {
+        NodeRpcAddress extraNodeRpcAddress = (NodeRpcAddress) foundRpcAddress.clone();
+        extraNodeRpcAddress.setNodeAddress("http://" + foundRpcAddress.getNodeAddress() + ":" + RPC_DEFAULT_PORT);
+        return extraNodeRpcAddress;
     }
 
     private String findPort(String rpcAddress) {

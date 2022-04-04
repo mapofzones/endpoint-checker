@@ -19,7 +19,7 @@ public class SyncInfo {
     @JsonProperty("earliest_app_hash")
     private String earliestAppHash;
     @JsonProperty("earliest_block_height")
-    private Integer earliestBlockHeight;
+    private Long earliestBlockHeight;
     @JsonProperty("earliest_block_time")
     private Timestamp earliestBlockTime;
 
@@ -50,7 +50,7 @@ public class SyncInfo {
         return earliestAppHash;
     }
 
-    public Integer getEarliestBlockHeight() {
+    public Long getEarliestBlockHeight() {
         return earliestBlockHeight;
     }
 

@@ -1,9 +1,9 @@
 package com.mapofzones.endpointchecker.services.node.lcd;
 
-import com.mapofzones.endpointchecker.domain.Node;
+import com.mapofzones.endpointchecker.domain.NodeLcdAddress;
 
 public interface ILcdService {
 
-    void checkLiveness(Node node);
+    void checkLiveness(NodeLcdAddress nodeAddress);
 
 }
