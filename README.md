@@ -30,7 +30,7 @@ Running in a container:
 * `docker build -t endpoint-checker:v1 .`
 * `docker run --env EC_TIME_INTERVALS="pt2m:p1d:300;pt5h:p10d:300;pt24h:p30d:300;pt48h:p60d:300;p90d:-:300" --env POOL_SIZE=10 --env EC_SYNC_TIME="120s" --env EC_THREADS=4 --env DB_URL=jdbc:postgresql://<ip>:<port>/<db> --env DB_USER=<db_user> --env DB_PASS=<db_user_pass> -it -d --network="host" endpoint-checker:v1`
 
-###*Note:*<br>
+### *Note:*
 * `EC_TIME_INTERVALS:` <br>
   : - parameter separator <br>
   ; - interval separator <br>
