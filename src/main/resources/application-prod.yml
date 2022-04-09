@@ -2,7 +2,7 @@ endpoint-checker:
   sync-time: ${EC_SYNC_TIME}
   threads: ${EC_THREADS}
   threads-naming: 'Pool-EndpointChecker-Thread-%d'
-  page-size: ${EC_PAGE_SIZE}
+  time-intervals: ${EC_TIME_INTERVALS}
 
 spring:
   datasource:

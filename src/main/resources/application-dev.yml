@@ -1,8 +1,8 @@
 endpoint-checker:
-  sync-time: 1s
+  sync-time: 120s
   threads: 100
   threads-naming: 'Pool-EndpointChecker-Thread-%d'
-  page-size: 1000
+  time-intervals: 'pt2m:p1d:300;pt5h:p10d:300;pt24h:p30d:300;pt48h:p60d:300;p90d:-:300'
 
 spring:
   datasource:

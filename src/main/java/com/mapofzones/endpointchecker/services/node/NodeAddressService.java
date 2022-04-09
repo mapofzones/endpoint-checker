@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -40,15 +41,13 @@ public class NodeAddressService extends GenericService<NodeAddress, String, Node
     }
 
     @Override
-    public List<NodeAddress> findTopOfOldNodes(Integer limit) {
-        return nodeAddressRepository.findTopOfOldNodes(limit);
+    public List<NodeAddress> findTopOfOldNodesByTime(LocalDateTime from, LocalDateTime to, LocalDateTime timeToCheck, Integer limit) {
+        return nodeAddressRepository.findTopOfOldNodesByTime(from, to, timeToCheck, limit);
     }
 
     @Override
     @Transactional(propagation = Propagation.NEVER)
     public Set<NodeAddress> checkLivenessAndFindPeers(NodeAddress nodeAddress, Set<String> zoneNames) {
-
-        //log.info(nodeAddress.getIpOrDns() + " -- 1");
 
         Set<NodeAddress> nodeAddresses = new HashSet<>();
         Map<NodeAddressDto, Set<NodeRpcAddress>> foundPeers = new HashMap<>();
@@ -56,8 +55,6 @@ public class NodeAddressService extends GenericService<NodeAddress, String, Node
         if ((nodeAddress.getLcdAddresses() == null || nodeAddress.getLcdAddresses().isEmpty()) && !nodeAddress.getRpcAddresses().isEmpty()) {
             nodeAddress.setLcdAddresses(Stream.of(NodeLcdAddress.fromRpcAddress(Objects.requireNonNull(nodeAddress.getRpcAddresses().stream().findFirst().orElse(null)))).collect(Collectors.toSet()));
         }
-
-        //log.info(nodeAddress.getIpOrDns() + " -- 2");
 
         for (NodeRpcAddress nodeRpcAddress : nodeAddress.getRpcAddresses()) {
             if (URLHelper.isAddressValid(nodeRpcAddress.getRpcAddress())) {
@@ -69,8 +66,6 @@ public class NodeAddressService extends GenericService<NodeAddress, String, Node
                 });
             }
         }
-
-        //log.info(nodeAddress.getIpOrDns() + " -- 3");
 
         for (Map.Entry<NodeAddressDto, Set<NodeRpcAddress>> entry : foundPeers.entrySet()) {
 
@@ -87,15 +82,12 @@ public class NodeAddressService extends GenericService<NodeAddress, String, Node
             nodeAddresses.add(newNodeAddress);
         }
 
-        //log.info(nodeAddress.getIpOrDns() + " -- 4");
         for (NodeLcdAddress nodeLcdAddress : nodeAddress.getLcdAddresses()) {
             if (URLHelper.isAddressValid(nodeLcdAddress.getLcdAddress())) {
                 lcdService.checkLiveness(nodeLcdAddress);
             }
         }
 
-        ///log.info(nodeAddress.getIpOrDns() + " -- 5");
-        //log.info("--------------------");
         return nodeAddresses;
     }
 }

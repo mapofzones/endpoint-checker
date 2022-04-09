@@ -14,9 +14,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -33,6 +31,8 @@ public class NodeAddress implements Cloneable {
     public NodeAddress(@NonNull String ipOrDns) {
         this.ipOrDns = ipOrDns;
         this.lastCheckedAt = LocalDateTime.now();
+        this.isHidden = false;
+        this.isPrioritized = false;
     }
 
     @Id

@@ -41,6 +41,7 @@ public class RpcService implements IRpcService {
             checkLiveness(nodeRpcAddress, zoneNames, nodeStatus);
         } catch (Exception e) {
             nodeRpcAddress.setIsAlive(false);
+            nodeRpcAddress.setLastCheckedAt(LocalDateTime.now());
             return Collections.emptyMap();
         }
 
@@ -68,6 +69,7 @@ public class RpcService implements IRpcService {
                 nodeRpcAddress.setIsAlive(true);
                 nodeRpcAddress.setLastActive(LocalDateTime.now());
             }
+            nodeRpcAddress.setLastCheckedAt(LocalDateTime.now());
             nodeRpcAddress.setNodeId(nodeStatus.getNodeInfo().getDefaultNodeID());
             nodeRpcAddress.setVersion(nodeStatus.getNodeInfo().getVersion());
             nodeRpcAddress.setTxIndex(nodeStatus.getNodeInfo().getOther().getTxIndex());

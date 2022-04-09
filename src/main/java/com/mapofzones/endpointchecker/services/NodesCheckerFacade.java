@@ -1,14 +1,18 @@
 package com.mapofzones.endpointchecker.services;
 
+import com.mapofzones.endpointchecker.common.dto.TimeIntervalsDto;
 import com.mapofzones.endpointchecker.common.properties.EndpointCheckerProperties;
 import com.mapofzones.endpointchecker.common.threads.IThreadStarter;
 import com.mapofzones.endpointchecker.domain.NodeAddress;
 import com.mapofzones.endpointchecker.services.node.INodeAddressService;
 import com.mapofzones.endpointchecker.services.zone.IZoneService;
+import com.mapofzones.endpointchecker.utils.TimeIntervalsHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -45,7 +49,10 @@ public class NodesCheckerFacade {
         clearOldData();
 
         log.info("ready to get nodes");
-        nodeAddresses.addAll(nodeAddressService.findTopOfOldNodes(endpointCheckerProperties.getPageSize()));
+        TimeIntervalsDto timeIntervalsDto = TimeIntervalsHelper.parseTimeIntervals(endpointCheckerProperties.getTimeIntervals());
+        for (TimeIntervalsDto.TimeInterval interval : timeIntervalsDto.getTimeIntervals()) {
+            nodeAddresses.addAll(nodeAddressService.findTopOfOldNodesByTime(interval.getDateTimeFrom(), interval.getDateTimeTo(), interval.getTimeToCheck(), interval.getPageSize()));
+        }
         findZoneNames();
 
         log.info("Ready to check endpoints");
