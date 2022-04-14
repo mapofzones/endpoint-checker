@@ -1,5 +1,6 @@
 package com.mapofzones.endpointchecker.domain;
 
+import com.mapofzones.endpointchecker.services.node.location.LocationDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -79,7 +80,7 @@ public class NodeAddress implements Cloneable {
     private String lat;
 
     @Column(name = "LON")
-    private String lot;
+    private String lon;
 
     @Column(name = "TIMEZONE")
     private String timezone;
@@ -113,6 +114,27 @@ public class NodeAddress implements Cloneable {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "IP_OR_DNS")
     private Set<NodeRpcAddress> rpcAddresses;
+
+    public void fillNodeAddress(LocationDto dto) {
+        this.continent = dto.getContinent();
+        this.continentCode = dto.getContinentCode();
+        this.country = dto.getCountry();
+        this.countryCode = dto.getCountryCode();
+        this.region = dto.getRegion();
+        this.regionName = dto.getRegionName();
+        this.city = dto.getCity();
+        this.district = dto.getDistrict();
+        this.zip = dto.getZip();
+        this.lat = dto.getLat();
+        this.lon = dto.getLon();
+        this.timezone = dto.getTimezone();
+        this.timezoneOffset = dto.getTimezoneOffset();
+        this.ispName = dto.getIsp();
+        this.org = dto.getOrg();
+        this.orgAs = dto.getAs();
+        this.orgAsName = dto.getAsName();
+        this.isHosting = dto.getIsHosting();
+    }
 
     @Override
     public Object clone() {

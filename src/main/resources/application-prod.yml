@@ -4,6 +4,10 @@ endpoint-checker:
   threads-naming: 'Pool-EndpointChecker-Thread-%d'
   time-intervals: ${EC_TIME_INTERVALS}
 
+location-finder:
+  sync-time: ${EC_SYNC_TIME_FIND_LOCATION}
+  location-frequency-check: ${EC_LOCATION_FREQUENCY_CHECK}
+
 spring:
   datasource:
     url: ${DB_URL}

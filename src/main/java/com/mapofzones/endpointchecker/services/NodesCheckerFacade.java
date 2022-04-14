@@ -2,6 +2,7 @@ package com.mapofzones.endpointchecker.services;
 
 import com.mapofzones.endpointchecker.common.dto.TimeIntervalsDto;
 import com.mapofzones.endpointchecker.common.properties.EndpointCheckerProperties;
+import com.mapofzones.endpointchecker.common.properties.LocationFinderProperties;
 import com.mapofzones.endpointchecker.common.threads.IThreadStarter;
 import com.mapofzones.endpointchecker.domain.NodeAddress;
 import com.mapofzones.endpointchecker.services.node.INodeAddressService;
@@ -10,7 +11,6 @@ import com.mapofzones.endpointchecker.utils.TimeIntervalsHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -28,6 +28,7 @@ public class NodesCheckerFacade {
     private final INodeAddressService nodeAddressService;
     private final IThreadStarter pathfinderThreadStarter;
     private final EndpointCheckerProperties endpointCheckerProperties;
+    private final LocationFinderProperties locationFinderProperties;
 
     private final Set<String> zoneNames = new HashSet<>();
     private final Set<NodeAddress> nodeAddresses = Collections.synchronizedSet(new HashSet<>());
@@ -37,11 +38,13 @@ public class NodesCheckerFacade {
     public NodesCheckerFacade(IZoneService zoneService,
                               INodeAddressService nodeAddressService,
                               IThreadStarter pathfinderThreadStarter,
-                              EndpointCheckerProperties endpointCheckerProperties) {
+                              EndpointCheckerProperties endpointCheckerProperties,
+                              LocationFinderProperties locationFinderProperties) {
         this.zoneService = zoneService;
         this.nodeAddressService = nodeAddressService;
         this.pathfinderThreadStarter = pathfinderThreadStarter;
         this.endpointCheckerProperties = endpointCheckerProperties;
+        this.locationFinderProperties = locationFinderProperties;
     }
 
     public void checkAll() {
@@ -73,6 +76,10 @@ public class NodesCheckerFacade {
     public void check(NodeAddress nodeAddress) {
         nodeAddresses.addAll(nodeAddressService.checkLivenessAndFindPeers(nodeAddress, zoneNames));
         nodeAddress.setLastCheckedAt(LocalDateTime.now());
+    }
+
+    public void findLocations() {
+        nodeAddressService.findLocations(LocalDateTime.now().minus(locationFinderProperties.getLocationFrequencyCheck().toMillis(), ChronoUnit.MILLIS));
     }
 
     private void findZoneNames() {

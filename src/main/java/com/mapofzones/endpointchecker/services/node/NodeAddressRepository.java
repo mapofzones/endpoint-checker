@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.awt.print.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,4 +20,5 @@ public interface  NodeAddressRepository extends GenericRepository<NodeAddress, S
             "ORDER BY zn.last_checked_at ASC LIMIT :limit", nativeQuery = true)
     List<NodeAddress> findTopOfOldNodesByTime(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("timeToCheck") LocalDateTime timeToCheck, @Param("limit") Integer limit);
 
+    List<NodeAddress> findFirst100ByCountryIsNullOrLastCheckedAtBefore(LocalDateTime timeToFind);
 }

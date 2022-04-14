@@ -5,6 +5,8 @@ import com.mapofzones.endpointchecker.domain.NodeLcdAddress;
 import com.mapofzones.endpointchecker.domain.NodeRpcAddress;
 import com.mapofzones.endpointchecker.services.base.GenericService;
 import com.mapofzones.endpointchecker.services.node.lcd.ILcdService;
+import com.mapofzones.endpointchecker.services.node.location.LocationClient;
+import com.mapofzones.endpointchecker.services.node.location.LocationDto;
 import com.mapofzones.endpointchecker.services.node.rpc.IRpcService;
 import com.mapofzones.endpointchecker.services.node.rpc.NodeAddressDto;
 import com.mapofzones.endpointchecker.utils.URLHelper;
@@ -30,14 +32,17 @@ public class NodeAddressService extends GenericService<NodeAddress, String, Node
     private final NodeAddressRepository nodeAddressRepository;
     private final ILcdService lcdService;
     private final IRpcService rpcService;
+    private final LocationClient locationClient;
 
     public NodeAddressService(NodeAddressRepository nodeAddressRepository,
                               ILcdService lcdService,
-                              IRpcService rpcService) {
+                              IRpcService rpcService,
+                              LocationClient locationClient) {
         super(nodeAddressRepository);
         this.nodeAddressRepository = nodeAddressRepository;
         this.lcdService = lcdService;
         this.rpcService = rpcService;
+        this.locationClient = locationClient;
     }
 
     @Override
@@ -89,5 +94,18 @@ public class NodeAddressService extends GenericService<NodeAddress, String, Node
         }
 
         return nodeAddresses;
+    }
+
+    @Override
+    @Transactional
+    public void findLocations(LocalDateTime timeToCheck) {
+        List<NodeAddress> nodeAddresses = nodeAddressRepository.findFirst100ByCountryIsNullOrLastCheckedAtBefore(timeToCheck);
+        for (NodeAddress nodeAddress : nodeAddresses) {
+            LocationDto locationDto = locationClient.findLocation(nodeAddress.getIpOrDns());
+            if (locationDto.getStatus().equals("success")) {
+                nodeAddress.fillNodeAddress(locationDto);
+            }
+            nodeAddress.setLastCheckedAt(LocalDateTime.now());
+        }
     }
 }

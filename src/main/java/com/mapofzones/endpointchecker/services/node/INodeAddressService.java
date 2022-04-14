@@ -13,4 +13,5 @@ public interface INodeAddressService extends IGenericService<NodeAddress, String
 
     List<NodeAddress> findTopOfOldNodesByTime(LocalDateTime from, LocalDateTime to, LocalDateTime timeToCheck, Integer limit);
     Set<NodeAddress> checkLivenessAndFindPeers(NodeAddress nodeAddress, Set<String> zoneNames);
+    void findLocations(LocalDateTime timeToCheck);
 }
