@@ -16,12 +16,12 @@ public class NodesCheckerScheduler {
         this.nodesCheckerFacade = nodesCheckerFacade;
     }
 
-//    @Scheduled(fixedDelayString = "#{endpointCheckerProperties.syncTime}", initialDelay = 10)
-//    public void checkNodes() {
-//        iteration += 1;
-//        log.info("Iteration: " + iteration);
-//        nodesCheckerFacade.checkAll();
-//    }
+    @Scheduled(fixedDelayString = "#{endpointCheckerProperties.syncTime}", initialDelay = 10)
+    public void checkNodes() {
+        iteration += 1;
+        log.info("Iteration: " + iteration);
+        nodesCheckerFacade.checkAll();
+    }
 
     @Scheduled(fixedDelayString = "#{locationFinderProperties.syncTime}", initialDelay = 10)
     public void findNodeLocation() {
