@@ -89,7 +89,7 @@ public class NodeAddressService extends GenericService<NodeAddress, String, Node
 
         for (NodeLcdAddress nodeLcdAddress : nodeAddress.getLcdAddresses()) {
             if (URLHelper.isAddressValid(nodeLcdAddress.getLcdAddress())) {
-                lcdService.checkLiveness(nodeLcdAddress);
+                lcdService.checkLiveness(nodeLcdAddress, zoneNames);
             }
         }
 
