@@ -8,12 +8,10 @@ import java.time.Duration;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "endpoint-checker")
-public class EndpointCheckerProperties {
+@ConfigurationProperties(prefix = "location-finder")
+public class LocationFinderProperties {
 
     private Duration syncTime;
-    private Integer threads;
-    private String threadsNaming;
-    private String timeIntervals;
+    private Duration locationFrequencyCheck;
 
 }
