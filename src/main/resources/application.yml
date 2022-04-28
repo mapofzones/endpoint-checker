@@ -3,7 +3,6 @@ adaptor:
   sync-time: 10000
 
 endpoint:
-  ip-info: 'http://ip-api.com/json/%s?fields=status,message,continent,continentCode,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,offset,isp,org,as,asname,hosting,query'
   lcd:
     node-info: '/node_info'
 

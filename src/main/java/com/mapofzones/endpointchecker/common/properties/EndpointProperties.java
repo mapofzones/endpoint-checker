@@ -11,7 +11,6 @@ public class EndpointProperties {
 
     private RPC rpc;
     private LCD lcd;
-    private String ipInfo;
 
     @Getter
     @Setter

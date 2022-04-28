@@ -1,18 +1,15 @@
 package com.mapofzones.endpointchecker.services;
 
-import com.mapofzones.endpointchecker.common.dto.TimeIntervalsDto;
 import com.mapofzones.endpointchecker.common.properties.EndpointCheckerProperties;
-import com.mapofzones.endpointchecker.common.properties.LocationFinderProperties;
+import com.mapofzones.endpointchecker.common.properties.EndpointProperties;
 import com.mapofzones.endpointchecker.common.threads.IThreadStarter;
-import com.mapofzones.endpointchecker.domain.NodeAddress;
-import com.mapofzones.endpointchecker.services.node.INodeAddressService;
+import com.mapofzones.endpointchecker.domain.Node;
+import com.mapofzones.endpointchecker.services.node.INodeService;
 import com.mapofzones.endpointchecker.services.zone.IZoneService;
-import com.mapofzones.endpointchecker.utils.TimeIntervalsHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,31 +17,28 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-@Slf4j
 @Component
+@Slf4j
 public class NodesCheckerFacade {
 
     private final IZoneService zoneService;
-    private final INodeAddressService nodeAddressService;
+    private final INodeService nodeService;
     private final IThreadStarter pathfinderThreadStarter;
     private final EndpointCheckerProperties endpointCheckerProperties;
-    private final LocationFinderProperties locationFinderProperties;
 
     private final Set<String> zoneNames = new HashSet<>();
-    private final Set<NodeAddress> nodeAddresses = Collections.synchronizedSet(new HashSet<>());
+    private final Set<Node> nodes = Collections.synchronizedSet(new HashSet<>());
 
-    private BlockingQueue<NodeAddress> nodeAddressQueue;
+    private BlockingQueue<Node> nodeQueue;
 
     public NodesCheckerFacade(IZoneService zoneService,
-                              INodeAddressService nodeAddressService,
+                              INodeService nodeService,
                               IThreadStarter pathfinderThreadStarter,
-                              EndpointCheckerProperties endpointCheckerProperties,
-                              LocationFinderProperties locationFinderProperties) {
+                              EndpointCheckerProperties endpointCheckerProperties) {
         this.zoneService = zoneService;
-        this.nodeAddressService = nodeAddressService;
+        this.nodeService = nodeService;
         this.pathfinderThreadStarter = pathfinderThreadStarter;
         this.endpointCheckerProperties = endpointCheckerProperties;
-        this.locationFinderProperties = locationFinderProperties;
     }
 
     public void checkAll() {
@@ -52,20 +46,17 @@ public class NodesCheckerFacade {
         clearOldData();
 
         log.info("ready to get nodes");
-        TimeIntervalsDto timeIntervalsDto = TimeIntervalsHelper.parseTimeIntervals(endpointCheckerProperties.getTimeIntervals());
-        for (TimeIntervalsDto.TimeInterval interval : timeIntervalsDto.getTimeIntervals()) {
-            nodeAddresses.addAll(nodeAddressService.findTopOfOldNodesByTime(interval.getDateTimeFrom(), interval.getDateTimeTo(), interval.getTimeToCheck(), interval.getPageSize()));
-        }
+        nodes.addAll(nodeService.findTopOfOldNodes(endpointCheckerProperties.getPageSize()));
         findZoneNames();
 
         log.info("Ready to check endpoints");
-        if (!nodeAddresses.isEmpty()) {
-            nodeAddressQueue = new ArrayBlockingQueue<>(nodeAddresses.size(), true, nodeAddresses);
+        if (!nodes.isEmpty()) {
+            nodeQueue = new ArrayBlockingQueue<>(nodes.size(), true, nodes);
             pathfinderThreadStarter.startThreads(nodesCheckerFunction);
             pathfinderThreadStarter.waitMainThread();
 
             log.info("Ready to save nodes");
-            nodeAddressService.saveAll(new ArrayList<>(nodeAddresses));
+            nodeService.saveAll(new ArrayList<>(nodes));
         }
 
         log.info("Finished!");
@@ -73,13 +64,9 @@ public class NodesCheckerFacade {
 
     }
 
-    public void check(NodeAddress nodeAddress) {
-        nodeAddresses.addAll(nodeAddressService.checkLivenessAndFindPeers(nodeAddress, zoneNames));
-        nodeAddress.setLastCheckedAt(LocalDateTime.now());
-    }
-
-    public void findLocations() {
-        nodeAddressService.findLocations(LocalDateTime.now().minus(locationFinderProperties.getLocationFrequencyCheck().toMillis(), ChronoUnit.MILLIS));
+    public void check(Node node) {
+        nodes.addAll(nodeService.checkLivenessAndFindPeers(node, zoneNames));
+        node.setLastCheckedAt(new Timestamp(System.currentTimeMillis()));
     }
 
     private void findZoneNames() {
@@ -91,11 +78,10 @@ public class NodesCheckerFacade {
 
     private final Runnable nodesCheckerFunction = () -> {
         while (true) {
-            if (!nodeAddressQueue.isEmpty()) {
+            if (!nodeQueue.isEmpty()) {
                 try {
-                    NodeAddress currentNode = nodeAddressQueue.take();
+                    Node currentNode = nodeQueue.take();
                     check(currentNode);
-                    log.info(currentNode.getIpOrDns() + "\t{}", "-- was checked");
                 } catch (InterruptedException e) {
                     log.error("Queue error. " + e.getCause());
                     e.printStackTrace();
@@ -106,8 +92,8 @@ public class NodesCheckerFacade {
     };
 
     private void clearOldData() {
-        if (!nodeAddresses.isEmpty()) {
-            nodeAddresses.clear();
+        if (!nodes.isEmpty()) {
+            nodes.clear();
             log.info("Old nodes cleared!!!");
         }
     }
