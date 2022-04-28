@@ -6,7 +6,6 @@ import com.mapofzones.endpointchecker.services.node.lcd.client.dto.NodeInfoDto;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Service
 public class LsdService implements ILcdService {
@@ -18,16 +17,12 @@ public class LsdService implements ILcdService {
     }
 
     @Override
-    public void checkLiveness(NodeLcdAddress nodeLcdAddress, Set<String> zoneNames) {
+    public void checkLiveness(NodeLcdAddress nodeLcdAddress) {
         NodeInfoDto nodeInfoDto = lcdClient.findNodeInfo(nodeLcdAddress.getLcdAddress());
-
-        if (nodeInfoDto.isSuccessReceived()) {
-            if (!nodeInfoDto.getNodeInfo().getNetwork().equals(nodeLcdAddress.getZone()) &&
-                    zoneNames.contains(nodeInfoDto.getNodeInfo().getNetwork())) {
-                nodeLcdAddress.setZone(nodeInfoDto.getNodeInfo().getNetwork());
-            }
-            nodeLcdAddress.setIsAlive(true);
+        nodeLcdAddress.setIsAlive(nodeInfoDto.isSuccessReceived() && nodeInfoDto.getNodeInfo().getNetwork().equals(nodeLcdAddress.getZone()));
+        if (nodeLcdAddress.getIsAlive()) {
             nodeLcdAddress.setLastActive(LocalDateTime.now());
         }
+        nodeLcdAddress.setLastCheckedAt(LocalDateTime.now());
     }
 }
