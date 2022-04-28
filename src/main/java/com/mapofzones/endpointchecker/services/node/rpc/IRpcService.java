@@ -1,12 +1,11 @@
 package com.mapofzones.endpointchecker.services.node.rpc;
 
-import com.mapofzones.endpointchecker.domain.NodeRpcAddress;
+import com.mapofzones.endpointchecker.domain.Node;
 
-import java.util.Map;
 import java.util.Set;
 
 public interface IRpcService {
 
-    Map<NodeAddressDto, Set<NodeRpcAddress>> checkLivenessAndFindPeers(NodeRpcAddress nodeRpcAddress, Set<String> zoneNames);
+    Set<Node> checkLivenessAndFindPeers(Node node, Set<String> zoneNames);
 
 }
