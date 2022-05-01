@@ -23,13 +23,13 @@ public class LcdClient {
 
     public NodeInfoDto findNodeInfo(String address) {
         if (!address.isBlank()) {
-            URI uri = URI.create(address + endpointProperties.getLcd().getNodeInfo());
             try {
+                URI uri = URI.create(address + endpointProperties.getLcd().getNodeInfo());
                 Optional<NodeInfoDto> receivedNodeInfoDto = Optional.ofNullable(lcdClientRestTemplate.getForEntity(uri, NodeInfoDto.class).getBody());
                 NodeInfoDto nodeInfo = receivedNodeInfoDto.orElse(new NodeInfoDto(false));
                 nodeInfo.setSuccessReceived(true);
                 return nodeInfo;
-            } catch (RestClientException e) {
+            } catch (RestClientException | IllegalArgumentException e) {
                 //log.warn("Request cant be completed. " + uri);
                 return new NodeInfoDto(false);
             }
