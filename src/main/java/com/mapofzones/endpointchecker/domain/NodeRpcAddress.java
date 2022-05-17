@@ -69,6 +69,9 @@ public class NodeRpcAddress implements Cloneable {
     @Column(name = "LAST_CHECKED_AT")
     private LocalDateTime lastCheckedAt;
 
+    @Column(name = "ADDED_AT")
+    private LocalDateTime addedAt;
+
     @Override
     public Object clone() {
         try {

@@ -51,6 +51,9 @@ public class NodeLcdAddress {
     @Column(name = "LAST_CHECKED_AT")
     private LocalDateTime lastCheckedAt;
 
+    @Column(name = "ADDED_AT")
+    private LocalDateTime addedAt;
+
     public static NodeLcdAddress fromRpcAddress(NodeRpcAddress rpcAddress) {
         String port = URLHelper.getPort(rpcAddress.getRpcAddress());
         String lcdAddress = rpcAddress.getRpcAddress().replace(":" + port, ":" + NodeConstants.LCD_DEFAULT_PORT);
@@ -59,11 +62,12 @@ public class NodeLcdAddress {
         nodeLcdAddress.setLcdAddress(lcdAddress);
         nodeLcdAddress.setNodeAddress(rpcAddress.getNodeAddress());
         nodeLcdAddress.setLastCheckedAt(LocalDateTime.now());
-        nodeLcdAddress.setLastActive(LocalDateTime.now());
+        nodeLcdAddress.setLastActive(null);
         nodeLcdAddress.setIsAlive(false);
         nodeLcdAddress.setZone(rpcAddress.getZone());
         nodeLcdAddress.setIsHidden(rpcAddress.getIsHidden());
         nodeLcdAddress.setIsPrioritized(rpcAddress.getIsPrioritized());
+        nodeLcdAddress.setAddedAt(LocalDateTime.now());
 
         return nodeLcdAddress;
     }

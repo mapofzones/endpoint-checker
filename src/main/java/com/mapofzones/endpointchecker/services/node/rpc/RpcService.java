@@ -125,7 +125,8 @@ public class RpcService implements IRpcService {
         foundNodeRpcAddress.setRpcAddress("http://" + peer.getRemoteIP() + ":" + port);
         foundNodeRpcAddress.setNodeAddress(foundNodeAddress.getIpOrDns());
         foundNodeRpcAddress.setLastCheckedAt(LocalDateTime.now());
-        foundNodeRpcAddress.setLastActive(LocalDateTime.now());
+        foundNodeRpcAddress.setAddedAt(LocalDateTime.now());
+        foundNodeRpcAddress.setLastActive(null);
         foundNodeRpcAddress.setIsAlive(false);
         foundNodeRpcAddress.setIsHidden(false);
         foundNodeRpcAddress.setIsPrioritized(false);
