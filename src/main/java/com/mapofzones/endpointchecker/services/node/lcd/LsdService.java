@@ -32,6 +32,11 @@ public class LsdService implements ILcdService {
 
         if (nodeInfoDto.isSuccessReceived() && nodeInfoDto.getNodeInfo().getNetwork().equals(node.getZone())) {
             node.setLcdAddr(lcdAddress);
+
+            Long lastBlockHeight = lcdClient.findLastBlockHeight(lcdAddress);
+            if (lastBlockHeight > 0)
+                node.setLastBlockHeight(lastBlockHeight);
+
             node.setIsLcdAddrActive(true);
         } else {
             node.setIsLcdAddrActive(false);

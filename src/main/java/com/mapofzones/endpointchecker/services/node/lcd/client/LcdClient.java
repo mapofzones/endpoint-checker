@@ -1,5 +1,7 @@
 package com.mapofzones.endpointchecker.services.node.lcd.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mapofzones.endpointchecker.common.properties.EndpointProperties;
 import com.mapofzones.endpointchecker.services.node.lcd.client.dto.NodeInfoDto;
 import lombok.extern.slf4j.Slf4j;
@@ -34,5 +36,21 @@ public class LcdClient {
                 return new NodeInfoDto(false);
             }
         } else return new NodeInfoDto(false);
+    }
+
+    public Long findLastBlockHeight(String address) {
+        try {
+            URI uri = URI.create(address + endpointProperties.getLcd().getBlocksLatest());
+            Optional<String> receivedJson = Optional.ofNullable(lcdClientRestTemplate.getForEntity(uri, String.class).getBody());
+            String json = receivedJson.orElse(null);
+
+            if (json != null) {
+                ObjectNode node = new ObjectMapper().readValue(json, ObjectNode.class);
+                return node.get("block").get("header").get("height").asLong();
+            } else return 0L;
+
+        } catch (Exception x) {
+            return 0L;
+        }
     }
 }

@@ -22,5 +22,6 @@ public class EndpointProperties {
     @Setter
     public static class LCD {
         private String nodeInfo;
+        private String blocksLatest;
     }
 }

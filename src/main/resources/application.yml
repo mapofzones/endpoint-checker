@@ -5,6 +5,7 @@ adaptor:
 endpoint:
   lcd:
     node-info: '/node_info'
+    blocks-latest: '/blocks/latest'
 
 spring:
   main:
