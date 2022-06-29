@@ -1,7 +1,6 @@
 endpoint-checker:
   sync-time: 1s
   threads: 100
-  threads-naming: 'Pool-EndpointChecker-Thread-%d'
   page-size: 1000
 
 spring:

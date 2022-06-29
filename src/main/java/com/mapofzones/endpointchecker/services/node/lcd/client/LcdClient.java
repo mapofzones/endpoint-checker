@@ -30,6 +30,7 @@ public class LcdClient {
                 Optional<NodeInfoDto> receivedNodeInfoDto = Optional.ofNullable(lcdClientRestTemplate.getForEntity(uri, NodeInfoDto.class).getBody());
                 NodeInfoDto nodeInfo = receivedNodeInfoDto.orElse(new NodeInfoDto(false));
                 nodeInfo.setSuccessReceived(true);
+                //log.warn("Request was completed: " + uri);
                 return nodeInfo;
             } catch (RestClientException | IllegalArgumentException e) {
                 //log.warn("Request cant be completed. " + uri);

@@ -4,8 +4,10 @@ import com.mapofzones.endpointchecker.common.properties.EndpointCheckerPropertie
 import com.mapofzones.endpointchecker.common.properties.EndpointProperties;
 import com.mapofzones.endpointchecker.common.threads.IThreadStarter;
 import com.mapofzones.endpointchecker.common.threads.ThreadStarter;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 
 @Configuration
 public class EndpointCheckerConf {
@@ -21,7 +23,8 @@ public class EndpointCheckerConf {
     }
 
     @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public IThreadStarter nodeCheckerThreadStarter() {
-        return new ThreadStarter(endpointCheckerProperties().getThreads(), endpointCheckerProperties().getThreadsNaming());
+        return new ThreadStarter(endpointCheckerProperties().getThreads());
     }
 }

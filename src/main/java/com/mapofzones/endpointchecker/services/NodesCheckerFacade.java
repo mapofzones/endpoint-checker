@@ -1,7 +1,6 @@
 package com.mapofzones.endpointchecker.services;
 
 import com.mapofzones.endpointchecker.common.properties.EndpointCheckerProperties;
-import com.mapofzones.endpointchecker.common.properties.EndpointProperties;
 import com.mapofzones.endpointchecker.common.threads.IThreadStarter;
 import com.mapofzones.endpointchecker.domain.Node;
 import com.mapofzones.endpointchecker.services.node.INodeService;
@@ -16,6 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
 
 @Component
 @Slf4j
@@ -53,8 +53,6 @@ public class NodesCheckerFacade {
         if (!nodes.isEmpty()) {
             nodeQueue = new ArrayBlockingQueue<>(nodes.size(), true, nodes);
             pathfinderThreadStarter.startThreads(nodesCheckerFunction);
-            pathfinderThreadStarter.waitMainThread();
-
             log.info("Ready to save nodes");
             nodeService.saveAll(new ArrayList<>(nodes));
         }
@@ -76,20 +74,15 @@ public class NodesCheckerFacade {
         zoneNames.addAll(zoneService.findUniqueZoneNames());
     }
 
-    private final Runnable nodesCheckerFunction = () -> {
-        while (true) {
-            if (!nodeQueue.isEmpty()) {
-                try {
-                    Node currentNode = nodeQueue.take();
-                    check(currentNode);
-                } catch (InterruptedException e) {
-                    log.error("Queue error. " + e.getCause());
-                    e.printStackTrace();
-                }
-            }
-            else break;
+    private final Runnable nodesCheckerFunction = () -> nodeQueue.stream().parallel().forEach(node -> {
+        try {
+            Node currentNode = nodeQueue.take();
+            check(currentNode);
+        } catch (InterruptedException e) {
+            log.error("Queue error. " + e.getCause());
+            e.printStackTrace();
         }
-    };
+    });
 
     private void clearOldData() {
         if (!nodes.isEmpty()) {

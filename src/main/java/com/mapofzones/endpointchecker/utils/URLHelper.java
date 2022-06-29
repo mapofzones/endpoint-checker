@@ -48,7 +48,7 @@ public class URLHelper {
         try {
             return new URL(address).getHost();
         } catch (MalformedURLException e) {
-            log.warn("Cant find host: " + address);
+            //log.warn("Cant find host: " + address);
             return EMPTY_STRING;
         }
     }
