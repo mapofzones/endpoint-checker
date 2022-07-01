@@ -9,6 +9,7 @@ import com.mapofzones.endpointchecker.services.node.INodeAddressService;
 import com.mapofzones.endpointchecker.services.zone.IZoneService;
 import com.mapofzones.endpointchecker.utils.TimeIntervalsHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -47,6 +48,7 @@ public class NodesCheckerFacade {
         this.locationFinderProperties = locationFinderProperties;
     }
 
+    @Async
     public void checkAll() {
         log.info("Starting...");
         clearOldData();
@@ -62,7 +64,6 @@ public class NodesCheckerFacade {
         if (!nodeAddresses.isEmpty()) {
             nodeAddressQueue = new ArrayBlockingQueue<>(nodeAddresses.size(), true, nodeAddresses);
             pathfinderThreadStarter.startThreads(nodesCheckerFunction);
-            pathfinderThreadStarter.waitMainThread();
 
             log.info("Ready to save nodes");
             nodeAddressService.saveAll(new ArrayList<>(nodeAddresses));
@@ -78,6 +79,7 @@ public class NodesCheckerFacade {
         nodeAddress.setLastCheckedAt(LocalDateTime.now());
     }
 
+    @Async
     public void findLocations() {
         nodeAddressService.findLocations(LocalDateTime.now().minus(locationFinderProperties.getLocationFrequencyCheck().toMillis(), ChronoUnit.MILLIS));
     }
@@ -89,21 +91,15 @@ public class NodesCheckerFacade {
         zoneNames.addAll(zoneService.findUniqueZoneNames());
     }
 
-    private final Runnable nodesCheckerFunction = () -> {
-        while (true) {
-            if (!nodeAddressQueue.isEmpty()) {
-                try {
-                    NodeAddress currentNode = nodeAddressQueue.take();
-                    check(currentNode);
-                    log.info(currentNode.getIpOrDns() + "\t{}", "-- was checked");
-                } catch (InterruptedException e) {
-                    log.error("Queue error. " + e.getCause());
-                    e.printStackTrace();
-                }
-            }
-            else break;
+    private final Runnable nodesCheckerFunction = () -> nodeAddressQueue.stream().parallel().forEach(node -> {
+        try {
+            NodeAddress currentNodeAddress = nodeAddressQueue.take();
+            check(currentNodeAddress);
+        } catch (InterruptedException e) {
+            log.error("Queue error. " + e.getCause());
+            e.printStackTrace();
         }
-    };
+    });
 
     private void clearOldData() {
         if (!nodeAddresses.isEmpty()) {

@@ -13,7 +13,6 @@ public class EndpointCheckerProperties {
 
     private Duration syncTime;
     private Integer threads;
-    private String threadsNaming;
     private String timeIntervals;
 
 }

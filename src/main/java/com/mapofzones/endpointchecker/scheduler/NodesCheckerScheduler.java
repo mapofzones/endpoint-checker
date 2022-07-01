@@ -23,7 +23,7 @@ public class NodesCheckerScheduler {
         nodesCheckerFacade.checkAll();
     }
 
-    @Scheduled(fixedDelayString = "#{locationFinderProperties.syncTime}", initialDelay = 10)
+    @Scheduled(fixedDelayString = "#{locationFinderProperties.syncTime}", initialDelay = 10000)
     public void findNodeLocation() {
         nodesCheckerFacade.findLocations();
     }

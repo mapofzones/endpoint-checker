@@ -1,7 +1,6 @@
 endpoint-checker:
   sync-time: ${EC_SYNC_TIME}
   threads: ${EC_THREADS}
-  threads-naming: 'Pool-EndpointChecker-Thread-%d'
   time-intervals: ${EC_TIME_INTERVALS}
 
 location-finder:
