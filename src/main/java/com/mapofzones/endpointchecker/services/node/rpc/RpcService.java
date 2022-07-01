@@ -140,8 +140,11 @@ public class RpcService implements IRpcService {
     }
 
     private String findPort(String rpcAddress) {
+
+        //String port = rpcAddress.substring(rpcAddress.lastIndexOf(":") + 1);
+
         String[] arr = rpcAddress.split(":");
-        return arr[2];
+        return rpcAddress.substring(rpcAddress.lastIndexOf(":") + 1);
     }
 
     private String findRpcAddress(String rpcAddress) {
