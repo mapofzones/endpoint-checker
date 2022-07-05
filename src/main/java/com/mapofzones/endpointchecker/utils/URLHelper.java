@@ -14,7 +14,7 @@ public class URLHelper {
         try {
             return String.valueOf(new URL(address).getPort());
         } catch (MalformedURLException e) {
-            log.warn("Cant find port: " + address);
+            //log.warn("Cant find port: " + address);
             return EMPTY_STRING;
         }
     }

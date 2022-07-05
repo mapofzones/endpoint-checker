@@ -24,4 +24,9 @@ public class ThreadStarter implements IThreadStarter{
         }
     }
 
+    @Override
+    public boolean isDone() {
+        return pool.getRunningThreadCount() == 0;
+    }
+
 }
