@@ -43,7 +43,7 @@ public class NodeLcdAddress {
     private Boolean isAlive;
 
     @Column(name = "RESPONSE_TIME")
-    private Long responseTime;
+    private Integer responseTime;
 
     @Column(name = "LAST_ACTIVE")
     private LocalDateTime lastActive;

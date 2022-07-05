@@ -77,10 +77,10 @@ public class NodeAddress implements Cloneable {
     private String zip;
 
     @Column(name = "LAT")
-    private String lat;
+    private Float lat;
 
     @Column(name = "LON")
-    private String lon;
+    private Float lon;
 
     @Column(name = "TIMEZONE")
     private String timezone;
@@ -125,8 +125,8 @@ public class NodeAddress implements Cloneable {
         this.city = dto.getCity();
         this.district = dto.getDistrict();
         this.zip = dto.getZip();
-        this.lat = dto.getLat();
-        this.lon = dto.getLon();
+        this.lat = dto.getLat() != null ? Float.parseFloat(dto.getLat()) : null;
+        this.lon = dto.getLon() != null ? Float.parseFloat(dto.getLon()) : null;
         this.timezone = dto.getTimezone();
         this.timezoneOffset = dto.getTimezoneOffset();
         this.ispName = dto.getIsp();

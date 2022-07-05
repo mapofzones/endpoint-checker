@@ -25,10 +25,10 @@ public class LocationClient {
             try {
                 URI uri = URI.create(String.format(endpointProperties.getIpInfo(), ipOrDns));
                 Optional<LocationDto> foundLocationDto = Optional.ofNullable(locationClientRestTemplate.getForEntity(uri, LocationDto.class).getBody());
-                log.info("Found " + ipOrDns);
+                //log.info("Found " + ipOrDns);
                 return foundLocationDto.orElse(new LocationDto("fail"));
             } catch (RestClientException e) {
-                log.info("Failed " + ipOrDns);
+                //log.info("Failed " + ipOrDns);
                 return new LocationDto("fail");
             }
         } else return new LocationDto("fail");

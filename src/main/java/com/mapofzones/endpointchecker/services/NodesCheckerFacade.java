@@ -5,21 +5,24 @@ import com.mapofzones.endpointchecker.common.properties.EndpointCheckerPropertie
 import com.mapofzones.endpointchecker.common.properties.LocationFinderProperties;
 import com.mapofzones.endpointchecker.common.threads.IThreadStarter;
 import com.mapofzones.endpointchecker.domain.NodeAddress;
+import com.mapofzones.endpointchecker.domain.NodeLcdAddress;
+import com.mapofzones.endpointchecker.domain.NodeRpcAddress;
 import com.mapofzones.endpointchecker.services.node.INodeAddressService;
 import com.mapofzones.endpointchecker.services.zone.IZoneService;
 import com.mapofzones.endpointchecker.utils.TimeIntervalsHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -49,7 +52,7 @@ public class NodesCheckerFacade {
     }
 
     @Async
-    public void checkAll() {
+    public void checkAll(int iteration) {
         log.info("Starting...");
         clearOldData();
 
@@ -66,12 +69,21 @@ public class NodesCheckerFacade {
             pathfinderThreadStarter.startThreads(nodesCheckerFunction);
 
             log.info("Ready to save nodes");
-            nodeAddressService.saveAll(new ArrayList<>(nodeAddresses));
+
+            /* TODO: Need to change from save() to saveAll later.
+                When we try invoking saveAll() some entries of Set can't be saved, because ipOrDns in the Rpc address is null, but it's not
+             */
+            for (NodeAddress addr : nodeAddresses) {
+                try {
+                    nodeAddressService.save(addr);
+                } catch (DataIntegrityViolationException e) {
+                    String rpc = addr.getRpcAddresses().stream().map(NodeRpcAddress::getRpcAddress).collect(Collectors.joining(",", "{", "}"));
+                    String lcd = addr.getLcdAddresses().stream().map(NodeLcdAddress::getLcdAddress).collect(Collectors.joining(",", "{", "}"));
+                    log.error(String.format("Cant save: %s (RPC: %s, LCD:%s)", addr.getIpOrDns(), rpc, lcd));
+                }
+            }
+            log.info("Finish iteration of Endpoint checker: " + iteration);
         }
-
-        log.info("Finished!");
-        log.info("---------------");
-
     }
 
     public void check(NodeAddress nodeAddress) {
@@ -80,8 +92,9 @@ public class NodesCheckerFacade {
     }
 
     @Async
-    public void findLocations() {
+    public void findLocations(int iteration) {
         nodeAddressService.findLocations(LocalDateTime.now().minus(locationFinderProperties.getLocationFrequencyCheck().toMillis(), ChronoUnit.MILLIS));
+        log.info("Finish iteration of Find node location  " + iteration);
     }
 
     private void findZoneNames() {

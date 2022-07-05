@@ -31,6 +31,7 @@ public class NodeRpcAddress implements Cloneable {
     private String zone;
 
     @Column(name = "IP_OR_DNS")
+    @NonNull
     private String nodeAddress;
 
     @Column(name = "NODE_ID")
@@ -61,7 +62,7 @@ public class NodeRpcAddress implements Cloneable {
     private Boolean isAlive;
 
     @Column(name = "RESPONSE_TIME")
-    private Long responseTime;
+    private Integer responseTime;
 
     @Column(name = "LAST_ACTIVE")
     private LocalDateTime lastActive;

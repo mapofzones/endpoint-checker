@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 public class NodesCheckerScheduler {
 
     private final NodesCheckerFacade nodesCheckerFacade;
-    private int iteration = 0;
+    private int endpointCheckerIteration = 0;
+    private int findNodeLocationIteration = 0;
 
     public NodesCheckerScheduler(NodesCheckerFacade nodesCheckerFacade) {
         this.nodesCheckerFacade = nodesCheckerFacade;
@@ -18,13 +19,15 @@ public class NodesCheckerScheduler {
 
     @Scheduled(fixedDelayString = "#{endpointCheckerProperties.syncTime}", initialDelay = 10)
     public void checkNodes() {
-        iteration += 1;
-        log.info("Iteration: " + iteration);
-        nodesCheckerFacade.checkAll();
+        endpointCheckerIteration += 1;
+        log.info("Start iteration of Endpoint checker: " + endpointCheckerIteration);
+        nodesCheckerFacade.checkAll(endpointCheckerIteration);
     }
 
     @Scheduled(fixedDelayString = "#{locationFinderProperties.syncTime}", initialDelay = 10000)
     public void findNodeLocation() {
-        nodesCheckerFacade.findLocations();
+        findNodeLocationIteration += 1;
+        log.info("Start iteration of Find node location: " + findNodeLocationIteration);
+        nodesCheckerFacade.findLocations(findNodeLocationIteration);
     }
 }
