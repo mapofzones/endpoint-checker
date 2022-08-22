@@ -1,5 +1,5 @@
 endpoint-checker:
-  sync-time: 120s
+  sync-time: 10s
   threads: 100
   time-intervals: 'pt2m:p1d:300;pt5h:p10d:300;pt24h:p30d:300;pt48h:p60d:300;p90d:-:300'
 
@@ -14,5 +14,3 @@ spring:
     password: postgres
     hikari:
       maximum-pool-size: 1
-      data-source-properties:
-        stringtype: unspecified

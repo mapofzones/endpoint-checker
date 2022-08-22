@@ -7,6 +7,6 @@ import java.util.Set;
 
 public interface IRpcService {
 
-    Map<NodeAddressDto, Set<NodeRpcAddress>> checkLivenessAndFindPeers(NodeRpcAddress nodeRpcAddress, Set<String> zoneNames);
+    Map<NodeAddressDto, Set<NodeRpcAddress>> checkLivelinessAndFindPeers(NodeRpcAddress nodeRpcAddress, Set<String> zoneNames);
 
 }

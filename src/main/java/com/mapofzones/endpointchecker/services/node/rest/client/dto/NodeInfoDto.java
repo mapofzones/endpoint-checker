@@ -1,4 +1,4 @@
-package com.mapofzones.endpointchecker.services.node.lcd.client.dto;
+package com.mapofzones.endpointchecker.services.node.rest.client.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

@@ -14,5 +14,3 @@ spring:
     password: ${DB_PASS}
     hikari:
       maximum-pool-size: ${POOL_SIZE}
-      data-source-properties:
-        stringtype: unspecified

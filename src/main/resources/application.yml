@@ -4,7 +4,7 @@ adaptor:
 
 endpoint:
   ip-info: 'http://ip-api.com/json/%s?fields=status,message,continent,continentCode,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,offset,isp,org,as,asname,hosting,query'
-  lcd:
+  rest:
     node-info: '/node_info'
 
 spring:

@@ -10,7 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class EndpointProperties {
 
     private RPC rpc;
-    private LCD lcd;
+    private REST rest;
     private String ipInfo;
 
     @Getter
@@ -21,7 +21,7 @@ public class EndpointProperties {
 
     @Getter
     @Setter
-    public static class LCD {
+    public static class REST {
         private String nodeInfo;
     }
 }

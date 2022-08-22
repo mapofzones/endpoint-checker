@@ -14,7 +14,7 @@ public class URLHelper {
         try {
             return String.valueOf(new URL(address).getPort());
         } catch (MalformedURLException e) {
-            //log.warn("Cant find port: " + address);
+            log.warn("Cant find port: " + address);
             return EMPTY_STRING;
         }
     }
@@ -23,7 +23,7 @@ public class URLHelper {
         return isIpAddressValid(address) || isDomainNameOfAddressValid(address);
     }
 
-    private static boolean isIpAddressValid(String address) {
+    public static boolean isIpAddressValid(String address) {
         String zeroTo255 = "(\\d{1,2}|(0|1)\\d{2}|2[0-4]\\d|25[0-5])";
         String regex = zeroTo255 + "\\." + zeroTo255 + "\\." + zeroTo255 + "\\." + zeroTo255;
 
@@ -34,7 +34,7 @@ public class URLHelper {
         return ipAddress.matches(regex);
     }
 
-    private static boolean isDomainNameOfAddressValid(String address) {
+    public static boolean isDomainNameOfAddressValid(String address) {
         String regex = "[a-z0-9.-]{1,63}";
 
         String domainName = getHost(address);
@@ -44,7 +44,7 @@ public class URLHelper {
         return domainName.matches(regex);
     }
 
-    private static String getHost(String address) {
+    public static String getHost(String address) {
         try {
             return new URL(address).getHost();
         } catch (MalformedURLException e) {

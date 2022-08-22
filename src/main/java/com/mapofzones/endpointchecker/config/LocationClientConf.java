@@ -25,7 +25,7 @@ public class LocationClientConf {
 
     @Bean
     public LocationClient locationClient(RestTemplate locationClientRestTemplate,
-                                    EndpointProperties endpointProperties) {
+                                         EndpointProperties endpointProperties) {
         return new LocationClient(locationClientRestTemplate, endpointProperties);
     }
 }

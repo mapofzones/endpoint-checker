@@ -3,10 +3,13 @@ package com.mapofzones.endpointchecker.services.node.rpc.client.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Status {
+
     @JsonProperty("node_info")
     private DefaultNodeInfo nodeInfo;
+
     @JsonProperty("sync_info")
     private SyncInfo syncInfo;
+
     @JsonProperty("validator_info")
     private ValidatorInfo validatorInfo;
 

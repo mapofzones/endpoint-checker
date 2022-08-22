@@ -14,7 +14,7 @@ import java.util.List;
 @EqualsAndHashCode
 public class TimeIntervalsDto {
 
-    public List<TimeInterval> timeIntervals;
+    private List<TimeInterval> timeIntervals;
 
     public TimeIntervalsDto() {
         timeIntervals = new ArrayList<>();

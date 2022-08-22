@@ -1,7 +1,7 @@
-package com.mapofzones.endpointchecker.services.node.lcd.client;
+package com.mapofzones.endpointchecker.services.node.rest.client;
 
 import com.mapofzones.endpointchecker.common.properties.EndpointProperties;
-import com.mapofzones.endpointchecker.services.node.lcd.client.dto.NodeInfoDto;
+import com.mapofzones.endpointchecker.services.node.rest.client.dto.NodeInfoDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -10,22 +10,22 @@ import java.net.URI;
 import java.util.Optional;
 
 @Slf4j
-public class LcdClient {
+public class RestClient {
 
-    private final RestTemplate lcdClientRestTemplate;
+    private final RestTemplate restClientRestTemplate;
     private final EndpointProperties endpointProperties;
 
-    public LcdClient(RestTemplate lcdClientRestTemplate,
-                     EndpointProperties endpointProperties) {
-        this.lcdClientRestTemplate = lcdClientRestTemplate;
+    public RestClient(RestTemplate restClientRestTemplate,
+                      EndpointProperties endpointProperties) {
+        this.restClientRestTemplate = restClientRestTemplate;
         this.endpointProperties = endpointProperties;
     }
 
     public NodeInfoDto findNodeInfo(String address) {
         if (!address.isBlank()) {
-            URI uri = URI.create(address + endpointProperties.getLcd().getNodeInfo());
+            URI uri = URI.create(address + endpointProperties.getRest().getNodeInfo());
             try {
-                Optional<NodeInfoDto> receivedNodeInfoDto = Optional.ofNullable(lcdClientRestTemplate.getForEntity(uri, NodeInfoDto.class).getBody());
+                Optional<NodeInfoDto> receivedNodeInfoDto = Optional.ofNullable(restClientRestTemplate.getForEntity(uri, NodeInfoDto.class).getBody());
                 NodeInfoDto nodeInfo = receivedNodeInfoDto.orElse(new NodeInfoDto(false));
                 nodeInfo.setSuccessReceived(true);
                 return nodeInfo;

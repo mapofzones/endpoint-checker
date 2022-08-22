@@ -5,7 +5,7 @@ import com.mapofzones.endpointchecker.common.properties.EndpointCheckerPropertie
 import com.mapofzones.endpointchecker.common.properties.LocationFinderProperties;
 import com.mapofzones.endpointchecker.common.threads.IThreadStarter;
 import com.mapofzones.endpointchecker.domain.NodeAddress;
-import com.mapofzones.endpointchecker.domain.NodeLcdAddress;
+import com.mapofzones.endpointchecker.domain.NodeRestAddress;
 import com.mapofzones.endpointchecker.domain.NodeRpcAddress;
 import com.mapofzones.endpointchecker.services.node.INodeAddressService;
 import com.mapofzones.endpointchecker.services.zone.IZoneService;
@@ -78,8 +78,8 @@ public class NodesCheckerFacade {
                     nodeAddressService.save(addr);
                 } catch (DataIntegrityViolationException e) {
                     String rpc = addr.getRpcAddresses().stream().map(NodeRpcAddress::getRpcAddress).collect(Collectors.joining(",", "{", "}"));
-                    String lcd = addr.getLcdAddresses().stream().map(NodeLcdAddress::getLcdAddress).collect(Collectors.joining(",", "{", "}"));
-                    log.error(String.format("Cant save: %s (RPC: %s, LCD:%s)", addr.getIpOrDns(), rpc, lcd));
+                    String rest = addr.getRestAddresses().stream().map(NodeRestAddress::getRestAddress).collect(Collectors.joining(",", "{", "}"));
+                    log.error(String.format("Cant save: %s (RPC: %s, REST:%s)", addr.getIpOrDns(), rpc, rest));
                 }
             }
             log.info("Finish iteration of Endpoint checker: " + iteration);
@@ -87,7 +87,7 @@ public class NodesCheckerFacade {
     }
 
     public void check(NodeAddress nodeAddress) {
-        nodeAddresses.addAll(nodeAddressService.checkLivenessAndFindPeers(nodeAddress, zoneNames));
+        nodeAddresses.addAll(nodeAddressService.checkLivelinessAndFindPeers(nodeAddress, zoneNames));
         nodeAddress.setLastCheckedAt(LocalDateTime.now());
     }
 

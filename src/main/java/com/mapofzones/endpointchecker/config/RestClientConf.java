@@ -1,7 +1,7 @@
 package com.mapofzones.endpointchecker.config;
 
 import com.mapofzones.endpointchecker.common.properties.EndpointProperties;
-import com.mapofzones.endpointchecker.services.node.lcd.client.LcdClient;
+import com.mapofzones.endpointchecker.services.node.rest.client.RestClient;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,10 +12,10 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 @Configuration
-public class LcdClientConf {
+public class RestClientConf {
 
     @Bean
-    public RestTemplate lcdClientRestTemplate(RestTemplateBuilder restTemplateBuilder) {
+    public RestTemplate restClientRestTemplate(RestTemplateBuilder restTemplateBuilder) {
         return restTemplateBuilder
                 .additionalMessageConverters(new StringHttpMessageConverter(StandardCharsets.UTF_8))
                 .setConnectTimeout(Duration.ofSeconds(5))
@@ -24,8 +24,8 @@ public class LcdClientConf {
     }
 
     @Bean
-    public LcdClient lcdClient(RestTemplate lcdClientRestTemplate,
-                               EndpointProperties endpointProperties) {
-        return new LcdClient(lcdClientRestTemplate, endpointProperties);
+    public RestClient restClient(RestTemplate restClientRestTemplate,
+                                 EndpointProperties endpointProperties) {
+        return new RestClient(restClientRestTemplate, endpointProperties);
     }
 }

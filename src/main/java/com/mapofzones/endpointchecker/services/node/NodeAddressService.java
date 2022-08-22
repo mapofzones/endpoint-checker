@@ -1,10 +1,10 @@
 package com.mapofzones.endpointchecker.services.node;
 
 import com.mapofzones.endpointchecker.domain.NodeAddress;
-import com.mapofzones.endpointchecker.domain.NodeLcdAddress;
+import com.mapofzones.endpointchecker.domain.NodeRestAddress;
 import com.mapofzones.endpointchecker.domain.NodeRpcAddress;
 import com.mapofzones.endpointchecker.services.base.GenericService;
-import com.mapofzones.endpointchecker.services.node.lcd.ILcdService;
+import com.mapofzones.endpointchecker.services.node.rest.IRestService;
 import com.mapofzones.endpointchecker.services.node.location.LocationClient;
 import com.mapofzones.endpointchecker.services.node.location.LocationDto;
 import com.mapofzones.endpointchecker.services.node.rpc.IRpcService;
@@ -30,17 +30,17 @@ import java.util.stream.Stream;
 public class NodeAddressService extends GenericService<NodeAddress, String, NodeAddressRepository> implements INodeAddressService {
 
     private final NodeAddressRepository nodeAddressRepository;
-    private final ILcdService lcdService;
+    private final IRestService restService;
     private final IRpcService rpcService;
     private final LocationClient locationClient;
 
     public NodeAddressService(NodeAddressRepository nodeAddressRepository,
-                              ILcdService lcdService,
+                              IRestService restService,
                               IRpcService rpcService,
                               LocationClient locationClient) {
         super(nodeAddressRepository);
         this.nodeAddressRepository = nodeAddressRepository;
-        this.lcdService = lcdService;
+        this.restService = restService;
         this.rpcService = rpcService;
         this.locationClient = locationClient;
     }
@@ -52,18 +52,29 @@ public class NodeAddressService extends GenericService<NodeAddress, String, Node
 
     @Override
     @Transactional(propagation = Propagation.NEVER)
-    public Set<NodeAddress> checkLivenessAndFindPeers(NodeAddress nodeAddress, Set<String> zoneNames) {
+    public Set<NodeAddress> checkLivelinessAndFindPeers(NodeAddress nodeAddress, Set<String> zoneNames) {
 
         Set<NodeAddress> nodeAddresses = new HashSet<>();
         Map<NodeAddressDto, Set<NodeRpcAddress>> foundPeers = new HashMap<>();
 
-        if ((nodeAddress.getLcdAddresses() == null || nodeAddress.getLcdAddresses().isEmpty()) && !nodeAddress.getRpcAddresses().isEmpty()) {
-            nodeAddress.setLcdAddresses(Stream.of(NodeLcdAddress.fromRpcAddress(Objects.requireNonNull(nodeAddress.getRpcAddresses().stream().findFirst().orElse(null)))).collect(Collectors.toSet()));
-        }
+        findAndSetRestFromRpc(nodeAddress);
+        checkLivelinessAndFindPeersByRpcAddress(nodeAddress, zoneNames, foundPeers);
+        ifNodeAddressNotExistsBuildNewNodeAddress(nodeAddress, foundPeers, nodeAddresses);
+        checkLivelinessByRestAddress(nodeAddress, zoneNames);
 
+        return nodeAddresses;
+    }
+
+    private void findAndSetRestFromRpc(NodeAddress nodeAddress) {
+        if ((nodeAddress.getRestAddresses() == null || nodeAddress.getRestAddresses().isEmpty()) && !nodeAddress.getRpcAddresses().isEmpty()) {
+            nodeAddress.setRestAddresses(Stream.of(NodeRestAddress.fromRpcAddress(Objects.requireNonNull(nodeAddress.getRpcAddresses().stream().findFirst().orElse(null)))).collect(Collectors.toSet()));
+        }
+    }
+
+    private void checkLivelinessAndFindPeersByRpcAddress(NodeAddress nodeAddress, Set<String> zoneNames, Map<NodeAddressDto, Set<NodeRpcAddress>> foundPeers) {
         for (NodeRpcAddress nodeRpcAddress : nodeAddress.getRpcAddresses()) {
             if (URLHelper.isAddressValid(nodeRpcAddress.getRpcAddress())) {
-                Map<NodeAddressDto, Set<NodeRpcAddress>> currentFoundPeers = rpcService.checkLivenessAndFindPeers(nodeRpcAddress, zoneNames);
+                Map<NodeAddressDto, Set<NodeRpcAddress>> currentFoundPeers = rpcService.checkLivelinessAndFindPeers(nodeRpcAddress, zoneNames);
                 currentFoundPeers.forEach((key, value) -> {
                     if (foundPeers.containsKey(key))
                         foundPeers.get(key).addAll(value);
@@ -71,29 +82,31 @@ public class NodeAddressService extends GenericService<NodeAddress, String, Node
                 });
             }
         }
+    }
 
+    private void ifNodeAddressNotExistsBuildNewNodeAddress(NodeAddress nodeAddress, Map<NodeAddressDto, Set<NodeRpcAddress>> foundPeers, Set<NodeAddress> nodeAddresses) {
         for (Map.Entry<NodeAddressDto, Set<NodeRpcAddress>> entry : foundPeers.entrySet()) {
 
             NodeAddress newNodeAddress = new NodeAddress(entry.getKey().getIpOrDns());
             if (nodeAddress.equals(newNodeAddress)) {
                 nodeAddress.getRpcAddresses().addAll(entry.getValue());
-                Set<NodeLcdAddress> lcdAddresses = entry.getValue().stream().map(NodeLcdAddress::fromRpcAddress).collect(Collectors.toSet());
-                nodeAddress.getLcdAddresses().addAll(lcdAddresses);
+                Set<NodeRestAddress> restAddresses = entry.getValue().stream().map(NodeRestAddress::fromRpcAddress).collect(Collectors.toSet());
+                nodeAddress.getRestAddresses().addAll(restAddresses);
             } else {
                 newNodeAddress.setRpcAddresses(entry.getValue());
-                Set<NodeLcdAddress> lcdAddresses = entry.getValue().stream().map(NodeLcdAddress::fromRpcAddress).collect(Collectors.toSet());
-                newNodeAddress.setLcdAddresses(lcdAddresses);
+                Set<NodeRestAddress> restAddresses = entry.getValue().stream().map(NodeRestAddress::fromRpcAddress).collect(Collectors.toSet());
+                newNodeAddress.setRestAddresses(restAddresses);
             }
             nodeAddresses.add(newNodeAddress);
         }
+    }
 
-        for (NodeLcdAddress nodeLcdAddress : nodeAddress.getLcdAddresses()) {
-            if (URLHelper.isAddressValid(nodeLcdAddress.getLcdAddress())) {
-                lcdService.checkLiveness(nodeLcdAddress, zoneNames);
+    private void checkLivelinessByRestAddress(NodeAddress nodeAddress, Set<String> zoneNames) {
+        for (NodeRestAddress nodeRestAddress : nodeAddress.getRestAddresses()) {
+            if (URLHelper.isAddressValid(nodeRestAddress.getRestAddress())) {
+                restService.checkLiveliness(nodeRestAddress, zoneNames);
             }
         }
-
-        return nodeAddresses;
     }
 
     @Override

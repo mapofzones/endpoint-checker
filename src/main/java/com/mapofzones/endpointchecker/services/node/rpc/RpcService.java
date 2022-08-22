@@ -3,6 +3,7 @@ package com.mapofzones.endpointchecker.services.node.rpc;
 import com.mapofzones.endpointchecker.domain.NodeRpcAddress;
 import com.mapofzones.endpointchecker.services.node.rpc.client.JsonRpcClient;
 import com.mapofzones.endpointchecker.services.node.rpc.client.dto.NetInfo;
+import com.mapofzones.endpointchecker.services.node.rpc.client.dto.NodeInfo;
 import com.mapofzones.endpointchecker.services.node.rpc.client.dto.Peer;
 import com.mapofzones.endpointchecker.services.node.rpc.client.dto.Status;
 import lombok.extern.slf4j.Slf4j;
@@ -26,19 +27,26 @@ import static com.mapofzones.endpointchecker.common.constants.NodeConstants.RPC_
 @Slf4j
 public class RpcService implements IRpcService {
 
+    private final JsonRpcClient jsonRpcClient;
+
+    public RpcService(JsonRpcClient jsonRpcClient) {
+        this.jsonRpcClient = jsonRpcClient;
+    }
+
     @Override
-    public Map<NodeAddressDto, Set<NodeRpcAddress>> checkLivenessAndFindPeers(NodeRpcAddress nodeRpcAddress, Set<String> zoneNames) {
-        JsonRpcClient jsonRpcClient = new JsonRpcClient();
+    public Map<NodeAddressDto, Set<NodeRpcAddress>> checkLivelinessAndFindPeers(NodeRpcAddress nodeRpcAddress, Set<String> zoneNames) {
+
+        NodeInfo nodeInfo;
 
         try {
-            jsonRpcClient.initiate(nodeRpcAddress.getRpcAddress());
+            nodeInfo = jsonRpcClient.findNodeInfo(nodeRpcAddress.getRpcAddress());
         } catch (MalformedURLException e) {
             return Collections.emptyMap();
         }
 
         try {
-            Status nodeStatus = jsonRpcClient.getNodeStatus();
-            checkLiveness(nodeRpcAddress, zoneNames, nodeStatus);
+            Status nodeStatus = nodeInfo.getStatus();
+            checkLiveliness(nodeRpcAddress, zoneNames, nodeStatus);
         } catch (Exception e) {
             nodeRpcAddress.setIsAlive(false);
             nodeRpcAddress.setLastCheckedAt(LocalDateTime.now());
@@ -46,14 +54,14 @@ public class RpcService implements IRpcService {
         }
 
         try {
-            NetInfo netInfo = jsonRpcClient.getNetInfo();
+            NetInfo netInfo = nodeInfo.getNetInfo();
             return findPeers(nodeRpcAddress.getZone(), netInfo);
         } catch (Exception e) {
             return Collections.emptyMap();
         }
     }
 
-    private void checkLiveness(NodeRpcAddress nodeRpcAddress, Set<String> zoneNames, Status nodeStatus) {
+    private void checkLiveliness(NodeRpcAddress nodeRpcAddress, Set<String> zoneNames, Status nodeStatus) {
 
         try {
             String network = nodeStatus.getNodeInfo().getNetwork();
@@ -77,8 +85,6 @@ public class RpcService implements IRpcService {
             nodeRpcAddress.setLastBlockHeight(nodeStatus.getSyncInfo().getLatestBlockHeight());
             nodeRpcAddress.setEarliestBlockHeight(nodeStatus.getSyncInfo().getEarliestBlockHeight());
 
-        } catch (NullPointerException e) {
-//                todo: try request again. for MalformedURLException too?
         } catch (Exception e) {
             nodeRpcAddress.setIsAlive(false);
         }
@@ -135,15 +141,11 @@ public class RpcService implements IRpcService {
 
     private NodeRpcAddress buildExtraNodeRpcAddress(NodeRpcAddress foundRpcAddress) {
         NodeRpcAddress extraNodeRpcAddress = (NodeRpcAddress) foundRpcAddress.clone();
-        extraNodeRpcAddress.setNodeAddress("http://" + foundRpcAddress.getNodeAddress() + ":" + RPC_DEFAULT_PORT);
+        extraNodeRpcAddress.setRpcAddress("http://" + foundRpcAddress.getNodeAddress() + ":" + RPC_DEFAULT_PORT);
         return extraNodeRpcAddress;
     }
 
     private String findPort(String rpcAddress) {
-
-        //String port = rpcAddress.substring(rpcAddress.lastIndexOf(":") + 1);
-
-        String[] arr = rpcAddress.split(":");
         return rpcAddress.substring(rpcAddress.lastIndexOf(":") + 1);
     }
 

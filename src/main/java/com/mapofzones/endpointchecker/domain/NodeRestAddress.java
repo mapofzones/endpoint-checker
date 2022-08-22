@@ -17,14 +17,14 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "lcdAddress")
+@EqualsAndHashCode(of = "restAddress")
 @Entity
 @Table(name = "NODES_LCD_ADDRS")
-public class NodeLcdAddress {
+public class NodeRestAddress {
 
     @Id
     @Column(name = "LCD_ADDR")
-    private String lcdAddress;
+    private String restAddress;
 
     @Column(name = "ZONE")
     @NonNull
@@ -54,28 +54,28 @@ public class NodeLcdAddress {
     @Column(name = "ADDED_AT")
     private LocalDateTime addedAt;
 
-    public static NodeLcdAddress fromRpcAddress(NodeRpcAddress rpcAddress) {
+    public static NodeRestAddress fromRpcAddress(NodeRpcAddress rpcAddress) {
         String port = URLHelper.getPort(rpcAddress.getRpcAddress());
-        String lcdAddress = rpcAddress.getRpcAddress().replace(":" + port, ":" + NodeConstants.LCD_DEFAULT_PORT);
+        String restAddress = rpcAddress.getRpcAddress().replace(":" + port, ":" + NodeConstants.REST_DEFAULT_PORT);
 
-        NodeLcdAddress nodeLcdAddress = new NodeLcdAddress();
-        nodeLcdAddress.setLcdAddress(lcdAddress);
-        nodeLcdAddress.setNodeAddress(rpcAddress.getNodeAddress());
-        nodeLcdAddress.setLastCheckedAt(LocalDateTime.now());
-        nodeLcdAddress.setLastActive(null);
-        nodeLcdAddress.setIsAlive(false);
-        nodeLcdAddress.setZone(rpcAddress.getZone());
-        nodeLcdAddress.setIsHidden(rpcAddress.getIsHidden());
-        nodeLcdAddress.setIsPrioritized(rpcAddress.getIsPrioritized());
-        nodeLcdAddress.setAddedAt(LocalDateTime.now());
+        NodeRestAddress nodeRestAddress = new NodeRestAddress();
+        nodeRestAddress.setRestAddress(restAddress);
+        nodeRestAddress.setNodeAddress(rpcAddress.getNodeAddress());
+        nodeRestAddress.setLastCheckedAt(LocalDateTime.now());
+        nodeRestAddress.setLastActive(null);
+        nodeRestAddress.setIsAlive(false);
+        nodeRestAddress.setZone(rpcAddress.getZone());
+        nodeRestAddress.setIsHidden(rpcAddress.getIsHidden());
+        nodeRestAddress.setIsPrioritized(rpcAddress.getIsPrioritized());
+        nodeRestAddress.setAddedAt(LocalDateTime.now());
 
-        return nodeLcdAddress;
+        return nodeRestAddress;
     }
 
     @Override
     public String toString() {
-        return "NodeLcdAddress{" +
-                "lcdAddress='" + lcdAddress + '\'' +
+        return "NodeRestAddress{" +
+                "restAddress='" + restAddress + '\'' +
                 '}';
     }
 }

@@ -5,10 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Peer {
     @JsonProperty("node_info")
     private DefaultNodeInfo nodeInfo;
+
     @JsonProperty("is_outbound")
     private Boolean isOutbound;
+
     @JsonProperty("connection_status")
     private ConnectionStatus connectionStatus;
+
     @JsonProperty("remote_ip")
     private String remoteIP;
 

@@ -1,6 +1,5 @@
-package com.mapofzones.endpointchecker.processor;
+package com.mapofzones.endpointchecker.services.node.rpc;
 
-import com.mapofzones.endpointchecker.services.node.rpc.Parser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +9,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ParserTest {
     public BufferedReader reader;
@@ -65,23 +64,14 @@ class ParserTest {
     }
 
     @AfterEach
-    void tearDown() {
-        try {
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    void tearDown() throws IOException {
+        reader.close();
     }
 
     @Test
-    void parseChainId() {
+    void parseChainId() throws IOException {
         String expected = "cosmoshub-4";
-        String actual = null;
-        try {
-            actual = Parser.parseChainId(reader, "network");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String actual = Parser.parseChainId(reader, "network");
         assertEquals(expected, actual);
     }
 

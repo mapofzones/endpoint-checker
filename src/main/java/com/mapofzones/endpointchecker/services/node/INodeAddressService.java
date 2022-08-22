@@ -12,6 +12,6 @@ import java.util.Set;
 public interface INodeAddressService extends IGenericService<NodeAddress, String, NodeAddressRepository> {
 
     List<NodeAddress> findTopOfOldNodesByTime(LocalDateTime from, LocalDateTime to, LocalDateTime timeToCheck, Integer limit);
-    Set<NodeAddress> checkLivenessAndFindPeers(NodeAddress nodeAddress, Set<String> zoneNames);
+    Set<NodeAddress> checkLivelinessAndFindPeers(NodeAddress nodeAddress, Set<String> zoneNames);
     void findLocations(LocalDateTime timeToCheck);
 }

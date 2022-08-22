@@ -109,7 +109,7 @@ public class NodeAddress implements Cloneable {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "IP_OR_DNS")
-    private Set<NodeLcdAddress> lcdAddresses;
+    private Set<NodeRestAddress> restAddresses;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "IP_OR_DNS")
