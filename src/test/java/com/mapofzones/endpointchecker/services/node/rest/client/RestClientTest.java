@@ -20,11 +20,11 @@ class RestClientTest extends AbstractTest {
 
     @Test
     void findNodeInfoTest_isAlive() {
-        String testedAddress = "http://43.153.101.118:1317";
+        String testedAddress = "http://142.132.157.153:1317";
         NodeInfoDto dto = restClient.findNodeInfo(testedAddress);
         assertTrue(dto.isSuccessReceived());
         assertEquals(dto.getNodeInfo().getNetwork(), "osmosis-1");
-        assertEquals(dto.getNodeInfo().getVersion(), "0.34.19");
+        assertEquals(dto.getNodeInfo().getVersion(), "0.34.22");
     }
 
     @Test

@@ -16,10 +16,10 @@ public class JsonRpcClientTest {
     @Test
     void initiateRpcClient_ActiveAddress_Test() throws MalformedURLException {
         JsonRpcClient jsonRpcClient = new JsonRpcClient();
-        NodeInfo nodeInfo = jsonRpcClient.findNodeInfo("http://65.108.207.214:28657");
+        NodeInfo nodeInfo = jsonRpcClient.findNodeInfo("http://65.21.91.99:16957");
         assertAll(() -> {
-            assertEquals("cosmoshub-4", nodeInfo.getStatus().getNodeInfo().getNetwork());
-            assertEquals("12a4e4ab397ba89ff6a6b2abd1166e504533e768", nodeInfo.getStatus().getNodeInfo().getDefaultNodeID());
+            assertEquals("osmosis-1", nodeInfo.getStatus().getNodeInfo().getNetwork());
+            assertEquals("6f1d92857e39a6f26a3a914f807064824c255939", nodeInfo.getStatus().getNodeInfo().getDefaultNodeID());
         });
     }
 
