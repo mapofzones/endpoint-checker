@@ -4,6 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "endpoint")
@@ -22,6 +26,8 @@ public class EndpointProperties {
     @Setter
     public static class LCD {
         private String nodeInfo;
+        private String newNodeInfo;
         private String blocksLatest;
+        private String newBlocksLatest;
     }
 }

@@ -1,5 +1,6 @@
 package com.mapofzones.endpointchecker.services.node.lcd.client.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -8,7 +9,7 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NodeInfo {
 
-    @JsonProperty("id")
+    @JsonAlias({"id", "default_node_id"})
     private String id;
     @JsonProperty("moniker")
     private String moniker;

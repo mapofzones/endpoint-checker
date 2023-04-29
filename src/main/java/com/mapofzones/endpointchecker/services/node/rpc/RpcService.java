@@ -37,6 +37,7 @@ public class RpcService implements IRpcService {
             Status nodeStatus = jsonRpcClient.getNodeStatus();
             checkLiveness(node, zoneNames, nodeStatus);
         } catch (Exception e) {
+            e.printStackTrace();
             node.setIsAlive(false);
             node.setIsRpcAddrActive(false);
             return Collections.emptySet();

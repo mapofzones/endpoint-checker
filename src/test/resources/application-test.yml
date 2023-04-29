@@ -1,0 +1,14 @@
+endpoint-checker:
+  sync-time: 1s
+  threads: 100
+  page-size: 1000
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/moz_db
+    username: postgres
+    password: postgres
+    hikari:
+      maximum-pool-size: 1
+      data-source-properties:
+        stringtype: unspecified

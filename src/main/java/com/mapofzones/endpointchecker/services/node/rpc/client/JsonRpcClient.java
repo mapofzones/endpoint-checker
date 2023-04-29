@@ -22,8 +22,8 @@ public class JsonRpcClient {
 //        todo: do we need context?
         URL rpc = this.getURLbyUrlString(url);
         JsonRpcHttpClient client = this.createClient(rpc);
-        client.setConnectionTimeoutMillis(5000);
-        client.setReadTimeoutMillis(5000);
+        client.setConnectionTimeoutMillis(10000);
+        client.setReadTimeoutMillis(10000);
         nodeInfo = this.getNodeInfo(client);
     }
 

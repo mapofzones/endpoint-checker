@@ -1,5 +1,6 @@
 package com.mapofzones.endpointchecker.services.node.lcd.client.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,7 +19,7 @@ public class NodeInfoDto {
     @JsonProperty("application_version")
     private ApplicationVersion applicationVersion;
 
-    @JsonProperty("node_info")
+    @JsonAlias({"node_info", "default_node_info"})
     private NodeInfo nodeInfo;
 
     @JsonIgnore

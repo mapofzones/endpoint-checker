@@ -1,7 +1,9 @@
 package com.mapofzones.endpointchecker.services.node.lcd.client.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 
 @Data
@@ -12,13 +14,13 @@ public class ApplicationVersion {
     private String buildTags;
     @JsonProperty("client_name")
     private String clientName;
-    @JsonProperty("commit")
+    @JsonAlias({"commit", "git_commit"})
     private String commit;
-    @JsonProperty("go")
+    @JsonAlias({"go", "go_version"})
     private String go;
     @JsonProperty("name")
     private String name;
-    @JsonProperty("server_name")
+    @JsonAlias({"server_name", "app_name"})
     private String serverName;
     @JsonProperty("version")
     private String version;

@@ -1,9 +1,11 @@
 package com.mapofzones.endpointchecker.services.node.rpc.client.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.HashMap;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ValidatorInfo {
     @JsonProperty("address")
     private String address;

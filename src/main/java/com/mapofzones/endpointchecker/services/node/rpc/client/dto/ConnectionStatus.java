@@ -1,9 +1,11 @@
 package com.mapofzones.endpointchecker.services.node.rpc.client.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ConnectionStatus {
     @JsonProperty("Duration")
     private Long duration;

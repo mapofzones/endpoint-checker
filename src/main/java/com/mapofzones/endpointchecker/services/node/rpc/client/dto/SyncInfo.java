@@ -1,9 +1,11 @@
 package com.mapofzones.endpointchecker.services.node.rpc.client.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.sql.Timestamp;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SyncInfo {
     @JsonProperty("latest_block_hash")
     private String LatestBlockHash;

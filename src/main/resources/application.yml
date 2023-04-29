@@ -1,11 +1,9 @@
-adaptor:
-  host: http://<ip>:<port>
-  sync-time: 10000
-
 endpoint:
   lcd:
     node-info: '/node_info'
+    new-node-info: '/cosmos/base/tendermint/v1beta1/node_info'
     blocks-latest: '/blocks/latest'
+    new-blocks-latest: '/cosmos/base/tendermint/v1beta1/blocks/latest'
 
 spring:
   main:
