@@ -54,7 +54,7 @@ public class LcdClient {
             Integer blockLatest;
 
             for (String endpoint : blocksLatestEndpoints) {
-                URI uri = URI.create(address + endpoint);
+                URI uri = URI.create(address.trim() + endpoint);
                 blockLatest = findLastBlockHeight(uri);
 
                 if (blockLatest != -1) {
