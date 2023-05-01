@@ -36,7 +36,7 @@ public class RpcServiceTest extends AbstractTest {
         node.setVersion("v0.34.26");
         node.setMoniker("rpc-6");
         node.setTxIndex("on");
-        node.setLastBlockHeight(7875291L);
+        node.setLastBlockHeight(7875291);
         node.setIsRpcAddrActive(false);
         node.setIsLcdAddrActive(false);
         node.setIsHidden(false);

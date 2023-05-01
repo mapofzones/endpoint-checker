@@ -39,7 +39,7 @@ class LcdClientTest extends AbstractTest {
     @Test
     void findBlockLatestTest_isAlive() {
         String testedAddress = "http://51.89.6.150:1317";
-        Long blockHeight = lcdClient.findLastBlockHeight(testedAddress);
-        assertEquals(10856304L, blockHeight);
+        Integer blockHeight = lcdClient.findLastBlockHeight(testedAddress);
+        assertEquals(10856304, blockHeight);
     }
 }
