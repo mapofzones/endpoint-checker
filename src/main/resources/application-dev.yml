@@ -1,11 +1,11 @@
 endpoint-checker:
   sync-time: 1s
   threads: 100
-  page-size: 1000
+  page-size: 300
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/moz_db
+    url: jdbc:postgresql://localhost:5432/local_moz_db
     username: postgres
     password: postgres
     hikari:

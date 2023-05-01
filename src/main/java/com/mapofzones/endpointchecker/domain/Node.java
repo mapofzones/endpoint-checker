@@ -10,7 +10,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 
 @Data
@@ -53,7 +52,7 @@ public class Node implements Cloneable{
     private String txIndex;
 
     @Column(name = "connection_duration")
-    private BigInteger connectionDuration;
+    private Long connectionDuration;
 
     @Column(name = "is_send_connection_active")
     private Boolean isSendConnectionActive;
@@ -62,7 +61,7 @@ public class Node implements Cloneable{
     private Boolean isRecvConnectionActive;
 
     @Column(name = "last_block_height")
-    private Long lastBlockHeight;
+    private Integer lastBlockHeight;
 
     @Column(name = "is_rpc_addr_active")
     private Boolean isRpcAddrActive;

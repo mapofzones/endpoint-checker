@@ -12,7 +12,7 @@ public class SyncInfo {
     @JsonProperty("latest_app_hash")
     private String latestAppHash;
     @JsonProperty("latest_block_height")
-    private Long latestBlockHeight;
+    private Integer latestBlockHeight;
     @JsonProperty("latest_block_time")
     private Timestamp LatestBlockTime;
 
@@ -36,7 +36,7 @@ public class SyncInfo {
         return latestAppHash;
     }
 
-    public Long getLatestBlockHeight() {
+    public Integer getLatestBlockHeight() {
         return latestBlockHeight;
     }
 

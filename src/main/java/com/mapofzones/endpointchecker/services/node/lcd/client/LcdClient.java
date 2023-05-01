@@ -17,7 +17,6 @@ import java.util.Optional;
 public class LcdClient {
 
     private final RestTemplate lcdClientRestTemplate;
-    private final EndpointProperties endpointProperties;
 
     private List<String> nodeInfoEndpoints;
     private List<String> blocksLatestEndpoints;
@@ -25,7 +24,6 @@ public class LcdClient {
     public LcdClient(RestTemplate lcdClientRestTemplate,
                      EndpointProperties endpointProperties) {
         this.lcdClientRestTemplate = lcdClientRestTemplate;
-        this.endpointProperties = endpointProperties;
         this.nodeInfoEndpoints =
                 Arrays.asList(
                         endpointProperties.getLcd().getNewNodeInfo(),
@@ -41,7 +39,7 @@ public class LcdClient {
             NodeInfoDto nodeInfoDto;
 
             for (String endpoint : nodeInfoEndpoints) {
-                URI uri = URI.create(address + endpoint);
+                URI uri = URI.create(address.trim() + endpoint);
                 nodeInfoDto = findNodeInfo(uri);
                 if (nodeInfoDto.isSuccessReceived())
                     return nodeInfoDto;
@@ -51,22 +49,20 @@ public class LcdClient {
         return new NodeInfoDto(false);
     }
 
-    public Long findLastBlockHeight(String address) {
+    public Integer findLastBlockHeight(String address) {
         if (!address.isBlank()) {
-            Long blockLatest;
+            Integer blockLatest;
 
             for (String endpoint : blocksLatestEndpoints) {
                 URI uri = URI.create(address + endpoint);
                 blockLatest = findLastBlockHeight(uri);
 
-                if (blockLatest != -1L) {
+                if (blockLatest != -1) {
                     return blockLatest;
                 }
-
             }
-
         }
-        return -1L;
+        return -1;
     }
 
     private NodeInfoDto findNodeInfo(URI uri) {
@@ -76,26 +72,26 @@ public class LcdClient {
 
             nodeInfo.setSuccessReceived(true);
 
-            log.debug("Request was completed: " + uri);
+            //log.debug("Request was completed: " + uri);
             return nodeInfo;
         } catch (RestClientException | IllegalArgumentException e) {
-            log.warn("Request cant be completed. " + uri);
+            //log.warn("Request cant be completed. " + uri);
             return new NodeInfoDto(false);
         }
     }
 
-    private Long findLastBlockHeight(URI uri) {
+    private Integer findLastBlockHeight(URI uri) {
         try {
             Optional<String> receivedJson = Optional.ofNullable(lcdClientRestTemplate.getForEntity(uri, String.class).getBody());
             String json = receivedJson.orElse(null);
 
             if (json != null) {
                 ObjectNode node = new ObjectMapper().readValue(json, ObjectNode.class);
-                return node.get("block").get("header").get("height").asLong();
-            } else return -1L;
+                return node.get("block").get("header").get("height").asInt();
+            } else return -1;
 
         } catch (Exception x) {
-            return -1L;
+            return -1;
         }
     }
 
