@@ -75,6 +75,13 @@ public class RpcService implements IRpcService {
                 node.setIsAlive(true);
                 node.setIsRpcAddrActive(true);
             }
+
+            // Check if node is still catching up
+            if (nodeStatus.getSyncInfo().getCatchingUp()) {
+                node.setIsAlive(false);
+                node.setIsRpcAddrActive(false);
+            }
+
             node.setNodeId(nodeStatus.getNodeInfo().getDefaultNodeID());
             node.setVersion(nodeStatus.getNodeInfo().getVersion());
             node.setTxIndex(nodeStatus.getNodeInfo().getOther().getTxIndex());
